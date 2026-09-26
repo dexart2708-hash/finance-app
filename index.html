@@ -27,18 +27,36 @@
   <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com">
   <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
 
+  <!-- Compat: App + Firestore -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+
+  <!-- Modular: Auth (для TOTP MFA) -->
   <script type="module">
-    import { getAuth, getMultiFactorResolver, TotpMultiFactorGenerator, multiFactor } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
-    window.ModAuth = { getAuth, getMultiFactorResolver, TotpMultiFactorGenerator, multiFactor };
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signInWithEmailAndPassword,
+      signOut,
+      multiFactor,
+      getMultiFactorResolver,
+      TotpMultiFactorGenerator
+    } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+
+    window.ModAuth = {
+      getAuth,
+      onAuthStateChanged,
+      signInWithEmailAndPassword,
+      signOut,
+      multiFactor,
+      getMultiFactorResolver,
+      TotpMultiFactorGenerator
+    };
+    window.dispatchEvent(new Event('ModAuthReady'));
   </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
@@ -333,10 +351,7 @@
       border-bottom-width: 2px; border-radius: 4px; margin: 0 2px;
     }
 
-    mark {
-      background: var(--mark-bg); color: #1e293b; padding: 1px 3px;
-      border-radius: 3px; font-weight: 600;
-    }
+    mark { background: var(--mark-bg); color: #1e293b; padding: 1px 3px; border-radius: 3px; font-weight: 600; }
 
     .row { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end; }
     .field { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 160px; }
@@ -818,7 +833,7 @@
 
 <script>
 // ============================================
-// FIREBASE
+// FIREBASE (compat — для Firestore)
 // ============================================
 const firebaseConfig = {
   apiKey: "AIzaSyDdm0kaIesCu4CBennxPVoPhXwyAyAiwIg",
@@ -831,7 +846,6 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-const auth = firebase.auth();
 
 db.enablePersistence({ synchronizeTabs: true }).catch(err => {
   if (err.code === 'failed-precondition') console.warn('Офлайн: несколько вкладок.');
@@ -851,6 +865,25 @@ let searchQuery = '';
 let searchTimeout = null;
 let mfaResolver = null;
 let totpSecret = null;
+let auth = null; // Модульный auth — установим после загрузки ModAuth
+
+// ============================================
+// ИНИЦИАЛИЗАЦИЯ AUTH (ждать ModAuth)
+// ============================================
+function initAuth() {
+  return new Promise((resolve) => {
+    const check = () => {
+      if (window.ModAuth) {
+        auth = window.ModAuth.getAuth(firebase.app());
+        console.log('[AUTH] Модульный auth инициализирован');
+        resolve(auth);
+      } else {
+        setTimeout(check, 30);
+      }
+    };
+    check();
+  });
+}
 
 // ============================================
 // TOAST
@@ -925,11 +958,10 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   btn.textContent = 'Проверка…';
 
   try {
-    await auth.signInWithEmailAndPassword(email, password);
+    await window.ModAuth.signInWithEmailAndPassword(auth, email, password);
   } catch (err) {
     if (err.code === 'auth/multi-factor-auth-required') {
-      const authMod = window.ModAuth.getAuth(firebase.app());
-      mfaResolver = window.ModAuth.getMultiFactorResolver(authMod, err);
+      mfaResolver = window.ModAuth.getMultiFactorResolver(auth, err);
       showScreen('mfa');
       document.getElementById('mfaCode').value = '';
       document.getElementById('mfaError').classList.remove('visible');
@@ -994,32 +1026,32 @@ document.getElementById('mfaForm').addEventListener('submit', async (e) => {
 
 document.getElementById('mfaCancelBtn').addEventListener('click', async () => {
   mfaResolver = null;
-  try { await auth.signOut(); } catch (e) {}
+  try { await window.ModAuth.signOut(auth); } catch (e) {}
   showLogin();
 });
 
 // ============================================
-// РЕГИСТРАЦИЯ TOTP (ИСПРАВЛЕНО)
+// РЕГИСТРАЦИЯ TOTP
 // ============================================
 async function startEnrollment(user) {
   try {
     console.log('[2FA] Начинаем регистрацию TOTP...');
     console.log('[2FA] User email:', user?.email);
-    
-    // ✅ Правильный способ получения сессии через модульный SDK
-    const auth = firebase.auth(); // compat-инстанс
-    const multiFactorSession = await window.ModAuth.multiFactor(auth).getSession();
-    
-    // ✅ Передаём объект сессии в генератор секрета
+
+    const mfUser = window.ModAuth.multiFactor(auth.currentUser);
+    const multiFactorSession = await mfUser.getSession();
+    console.log('[2FA] Сессия MFA получена');
+
     totpSecret = await window.ModAuth.TotpMultiFactorGenerator.generateSecret(multiFactorSession);
     console.log('[2FA] Секрет сгенерирован:', totpSecret.secretKey);
+
     const qrContainer = document.getElementById('qrcode');
     qrContainer.innerHTML = '';
     const qrUrl = totpSecret.generateQrCodeUrl(user.email, 'Finance Valeeryyy');
     new QRCode(qrContainer, { text: qrUrl, width: 180, height: 180 });
-    
+
     document.getElementById('totpSecret').textContent = totpSecret.secretKey;
-    
+
     showScreen('enroll');
     document.getElementById('enrollCode').value = '';
     document.getElementById('enrollError').classList.remove('visible');
@@ -1030,7 +1062,7 @@ async function startEnrollment(user) {
     errBox.innerHTML = 'Ошибка 2FA: <strong>' + err.message + '</strong>';
     errBox.classList.add('visible');
     showScreen('login');
-    try { await auth.signOut(); } catch (e) {}
+    try { await window.ModAuth.signOut(auth); } catch (e) {}
   }
 }
 
@@ -1051,8 +1083,7 @@ document.getElementById('enrollForm').addEventListener('submit', async (e) => {
   btn.textContent = 'Сохранение…';
 
   try {
-    const authMod = window.ModAuth.getAuth(firebase.app());
-    const mfUser = window.ModAuth.multiFactor(authMod.currentUser);
+    const mfUser = window.ModAuth.multiFactor(auth.currentUser);
     const assertion = window.ModAuth.TotpMultiFactorGenerator.assertionForEnrollment(totpSecret, code);
     await mfUser.enroll(assertion, 'Google Authenticator');
     showToast('2FA успешно настроена!', 'success');
@@ -1070,29 +1101,12 @@ document.getElementById('enrollForm').addEventListener('submit', async (e) => {
 });
 
 // ============================================
-// АУТЕНТИФИКАЦИЯ
-// ============================================
-auth.onAuthStateChanged(async (user) => {
-  currentUser = user;
-  if (user) {
-    const factors = user.multiFactor?.enrolledFactors || [];
-    if (factors.length === 0) {
-      await startEnrollment(user);
-    } else {
-      showApp();
-    }
-  } else {
-    showLogin();
-  }
-});
-
-// ============================================
 // ВЫХОД
 // ============================================
 document.getElementById('logoutBtn').addEventListener('click', async () => {
   if (!confirm('Выйти из системы?')) return;
   try {
-    await auth.signOut();
+    await window.ModAuth.signOut(auth);
     showToast('Вы вышли из системы', 'info');
   } catch (err) {
     showToast('Ошибка выхода: ' + err.message, 'error');
@@ -1465,8 +1479,25 @@ document.getElementById('resetFilters').addEventListener('click', () => {
 });
 
 // ============================================
-// СТАРТ (onAuthStateChanged сам всё сделает)
+// СТАРТ
 // ============================================
+(async () => {
+  await initAuth();
+
+  window.ModAuth.onAuthStateChanged(auth, async (user) => {
+    currentUser = user;
+    if (user) {
+      const factors = user.multiFactor?.enrolledFactors || [];
+      if (factors.length === 0) {
+        await startEnrollment(user);
+      } else {
+        showApp();
+      }
+    } else {
+      showLogin();
+    }
+  });
+})();
 </script>
 </body>
 </html>
