@@ -701,7 +701,7 @@ let searchTimeout = null;
 let mfaResolver = null;
 let totpSecret = null;
 let appInitialized = false;
-let mfaJustCompleted = false; // ✅ флаг, что MFA только что пройден
+let mfaJustCompleted = false;
 
 // ============================================
 // TOAST
@@ -833,9 +833,10 @@ document.getElementById('mfaForm').addEventListener('submit', async (e) => {
 
     const assertion = TotpMultiFactorGenerator.assertionForSignIn(hint.uid, code);
     await mfaResolver.resolveSignIn(assertion);
-    // ✅ Помечаем, что MFA только что пройден — onAuthStateChanged пойдёт сразу в приложение
+    // ✅ Помечаем, что MFA только что пройден → onAuthStateChanged пойдёт сразу в приложение
     mfaJustCompleted = true;
     if (auth.currentUser) {
+      try { await auth.currentUser.getIdToken(true); } catch (e) { console.warn('[getIdToken]', e); }
       try { await auth.currentUser.reload(); } catch (e) { console.warn('[reload]', e); }
     }
     showToast('Вход выполнен!', 'success');
@@ -858,21 +859,26 @@ document.getElementById('mfaCancelBtn').addEventListener('click', async () => {
 });
 
 // ============================================
-// РЕГИСТРАЦИЯ TOTP
+// РЕГИСТРАЦИЯ TOTP (с защитой от повторного enrollment)
 // ============================================
 async function startEnrollment(user) {
   try {
-    const existing = user.multiFactor?.enrolledFactors || [];
+    // ✅ Принудительно обновляем токен и user ПЕРЕД проверкой — enrolledFactors будут свежими
+    try { await user.getIdToken(true); } catch (e) {}
+    try { await user.reload(); } catch (e) {}
+    const fresh = auth.currentUser;
+    const existing = fresh.multiFactor?.enrolledFactors || [];
     if (existing.length > 0) {
       console.log('[2FA] У пользователя уже есть TOTP-фактор, пропускаем регистрацию');
+      currentUser = fresh;
       showApp();
       return;
     }
 
     console.log('[2FA] Начинаем регистрацию TOTP...');
-    console.log('[2FA] User email:', user?.email);
+    console.log('[2FA] User email:', fresh?.email);
 
-    const mfUser = multiFactor(user);
+    const mfUser = multiFactor(fresh);
     const multiFactorSession = await mfUser.getSession();
     console.log('[2FA] Сессия MFA получена');
 
@@ -881,7 +887,7 @@ async function startEnrollment(user) {
 
     const qrContainer = document.getElementById('qrcode');
     qrContainer.innerHTML = '';
-    const qrUrl = totpSecret.generateQrCodeUrl(user.email, 'Finance Valeeryyy');
+    const qrUrl = totpSecret.generateQrCodeUrl(fresh.email, 'Finance Valeeryyy');
     new QRCode(qrContainer, { text: qrUrl, width: 180, height: 180 });
 
     document.getElementById('totpSecret').textContent = totpSecret.secretKey;
@@ -892,6 +898,15 @@ async function startEnrollment(user) {
     setTimeout(() => document.getElementById('enrollCode').focus(), 100);
   } catch (err) {
     console.error('[2FA] Ошибка регистрации TOTP:', err);
+
+    // ✅ Если сервер говорит «фактор уже есть» — значит кэш врал, просто показываем приложение
+    if (err.code === 'auth/maximum-second-factor-count-exceeded' ||
+        (err.message && err.message.includes('Too many'))) {
+      console.log('[2FA] Фактор уже существует → показываем приложение');
+      showApp();
+      return;
+    }
+
     const errBox = document.getElementById('loginError');
     errBox.innerHTML = 'Ошибка 2FA: <strong>' + err.message + '</strong>';
     errBox.classList.add('visible');
@@ -920,6 +935,7 @@ document.getElementById('enrollForm').addEventListener('submit', async (e) => {
     const mfUser = multiFactor(auth.currentUser);
     const assertion = TotpMultiFactorGenerator.assertionForEnrollment(totpSecret, code);
     await mfUser.enroll(assertion, 'Google Authenticator');
+    try { await auth.currentUser.getIdToken(true); } catch (e) {}
     try { await auth.currentUser.reload(); } catch (e) {}
     // ✅ Помечаем, чтобы onAuthStateChanged сразу показал приложение
     mfaJustCompleted = true;
@@ -1321,7 +1337,7 @@ onAuthStateChanged(auth, async (user) => {
       return;
     }
 
-    // ✅ Принудительно обновляем ID-токен и пользователя, чтобы enrolledFactors точно были свежими
+    // ✅ Принудительно обновляем ID-токен с сервера — reload() не обновляет enrolledFactors
     try { await user.getIdToken(true); } catch (e) { console.warn('[getIdToken]', e); }
     try { await user.reload(); } catch (e) { console.warn('[reload]', e); }
     const freshUser = auth.currentUser;
@@ -1331,7 +1347,7 @@ onAuthStateChanged(auth, async (user) => {
     console.log('[AUTH] Вошёл:', freshUser.email, '| TOTP-факторов:', factors.length);
 
     if (factors.length === 0) {
-      // ✅ Защита: если enrollment уже идёт, не запускаем повторно
+      // Если enrollment уже идёт — не запускаем повторно
       if (window.__enrolling) {
         console.log('[AUTH] Enrollment уже идёт, пропускаем');
         return;
