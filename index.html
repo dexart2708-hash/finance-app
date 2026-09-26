@@ -76,6 +76,102 @@
     body { padding: 40px 24px; }
     .container { max-width: 1280px; margin: 0 auto; }
 
+    /* ============ ЭКРАН ЛОГИНА ============ */
+    #loginScreen {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      min-height: 80vh;
+      animation: fadeInUp var(--transition-slow) both;
+    }
+    #loginScreen.visible { display: flex; }
+    .login-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: var(--shadow-xl);
+    }
+    .login-logo { text-align: center; margin-bottom: 28px; }
+    .login-logo-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border-radius: 18px;
+      font-size: 1.75rem;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-md);
+    }
+    .login-title {
+      font-size: 1.375rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      text-align: center;
+    }
+    .login-subtitle {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 6px;
+    }
+    .login-form .field { margin-bottom: 16px; }
+    .login-form button { width: 100%; margin-top: 8px; }
+    .login-error {
+      background: var(--expense-soft);
+      color: #991b1b;
+      border: 1px solid #fee2e2;
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      margin-bottom: 16px;
+      display: none;
+      animation: fadeIn var(--transition);
+    }
+    .login-error.visible { display: block; }
+
+    /* ============ ПРИЛОЖЕНИЕ ============ */
+    #app { display: none; }
+    #app.visible { display: block; }
+
+    /* ============ ШАПКА ============ */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .page-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .page-subtitle {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-weight: 400;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
     /* ============ АНИМАЦИИ ============ */
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(12px); }
@@ -98,34 +194,6 @@
       50%      { opacity: 0.6; }
     }
 
-    /* ============ ЗАГОЛОВОК ============ */
-    .page-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 32px;
-      padding-bottom: 24px;
-      border-bottom: 1px solid var(--border);
-      animation: fadeInUp var(--transition-slow) both;
-    }
-    .page-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      letter-spacing: -0.025em;
-      background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .page-subtitle {
-      font-size: 0.875rem;
-      color: var(--text-muted);
-      margin-top: 4px;
-      font-weight: 400;
-    }
-
     /* ============ КАРТОЧКИ ============ */
     .card {
       background: var(--surface);
@@ -134,7 +202,7 @@
       padding: 28px;
       margin-bottom: 20px;
       box-shadow: var(--shadow-sm);
-      transition: box-shadow var(--transition), transform var(--transition), border-color var(--transition);
+      transition: box-shadow var(--transition), border-color var(--transition);
       animation: fadeInUp var(--transition-slow) both;
     }
     .card:hover {
@@ -181,14 +249,13 @@
     input, select {
       font-family: var(--font);
       font-size: 1rem;
-      font-weight: 400;
       padding: 12px 14px;
       color: var(--text);
       background: var(--surface);
       border: 1px solid var(--border-strong);
       border-radius: var(--radius-sm);
       outline: none;
-      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
       width: 100%;
       min-height: 48px;
     }
@@ -196,7 +263,6 @@
     input:focus, select:focus {
       border-color: var(--accent);
       box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.08);
-      background: var(--surface);
     }
     input::placeholder { color: var(--text-subtle); }
     input[type="number"] { font-variant-numeric: tabular-nums; }
@@ -215,21 +281,17 @@
       appearance: none;
       text-align: left;
       padding-right: 40px;
-      position: relative; /* <--- ИСПРАВЛЕНИЕ: ограничивает кликабельную область */
+      position: relative;
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3e%3c/rect%3e%3cline x1='16' y1='2' x2='16' y2='6'%3e%3c/line%3e%3cline x1='8' y1='2' x2='8' y2='6'%3e%3c/line%3e%3cline x1='3' y1='10' x2='21' y2='10'%3e%3c/line%3e%3c/svg%3e");
       background-repeat: no-repeat;
       background-position: right 14px center;
     }
-    input[type="date"]::-webkit-date-and-time-value {
-      text-align: left;
-    }
+    input[type="date"]::-webkit-date-and-time-value { text-align: left; }
     input[type="date"]::-webkit-calendar-picker-indicator {
       opacity: 0;
       position: absolute;
-      right: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
+      right: 0; top: 0;
+      width: 100%; height: 100%;
       cursor: pointer;
       z-index: 2;
     }
@@ -239,7 +301,6 @@
       font-family: var(--font);
       font-size: 0.875rem;
       font-weight: 600;
-      letter-spacing: 0.01em;
       padding: 12px 22px;
       border: 1px solid transparent;
       border-radius: var(--radius-sm);
@@ -271,10 +332,8 @@
       transform: translateY(-1px);
     }
     button:hover::after { opacity: 1; }
-    button:active {
-      transform: translateY(0) scale(0.98);
-      box-shadow: var(--shadow-xs);
-    }
+    button:active { transform: translateY(0) scale(0.98); }
+    button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
     button.secondary {
       background: var(--surface);
@@ -285,10 +344,7 @@
     button.secondary:hover {
       background: var(--surface-hover);
       border-color: #9ca3af;
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-sm);
     }
-    button.secondary:active { transform: translateY(0) scale(0.98); }
 
     button.success {
       background: var(--surface);
@@ -299,8 +355,20 @@
     button.success:hover {
       background: var(--income-soft);
       border-color: #6ee7b7;
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-sm);
+    }
+
+    button.logout-btn {
+      background: var(--surface);
+      color: var(--expense);
+      border-color: #fecaca;
+      padding: 8px 16px;
+      min-height: 40px;
+      font-size: 0.8125rem;
+      box-shadow: var(--shadow-xs);
+    }
+    button.logout-btn:hover {
+      background: var(--expense-soft);
+      border-color: #fca5a5;
     }
 
     /* ============ ТАБЛИЦА ============ */
@@ -330,15 +398,9 @@
       border-bottom: 1px solid var(--border);
       color: var(--text);
       vertical-align: middle;
-      transition: background var(--transition-fast);
-    }
-    tbody tr {
-      transition: background var(--transition-fast), transform var(--transition-fast);
-      animation: fadeIn var(--transition) both;
     }
     tbody tr:last-child td { border-bottom: none; }
     tbody tr:hover { background: var(--surface-hover); }
-    tbody tr:hover td { color: var(--text); }
 
     td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
     .income  { color: var(--income);  font-weight: 600; }
@@ -351,10 +413,7 @@
       padding: 5px 12px;
       border-radius: 6px;
       white-space: nowrap;
-      letter-spacing: 0.02em;
-      transition: transform var(--transition-fast);
     }
-    .badge:hover { transform: scale(1.05); }
     .badge-income  { background: var(--income-soft); color: #065f46; border: 1px solid #d1fae5; }
     .badge-expense { background: var(--expense-soft); color: #991b1b; border: 1px solid #fee2e2; }
 
@@ -372,19 +431,13 @@
       outline: none;
       transition: all var(--transition-fast);
     }
-    .note-input:hover {
-      background: var(--surface-hover);
-      border-color: var(--border);
-    }
+    .note-input:hover { background: var(--surface-hover); border-color: var(--border); }
     .note-input:focus {
       background: var(--surface);
       border-color: var(--accent);
       box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
     }
-    .note-input::placeholder {
-      color: var(--text-subtle);
-      font-style: italic;
-    }
+    .note-input::placeholder { color: var(--text-subtle); font-style: italic; }
 
     /* ============ ОТЧЁТ ============ */
     .report { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
@@ -430,7 +483,6 @@
       font-variant-numeric: tabular-nums;
       line-height: 1.1;
       color: var(--text);
-      transition: color var(--transition);
     }
     .report-item .value.income  { color: var(--income); }
     .report-item .value.expense { color: var(--expense); }
@@ -441,7 +493,6 @@
       padding: 56px 20px;
       color: var(--text-muted);
       font-size: 0.875rem;
-      animation: fadeIn var(--transition);
     }
     .empty::before {
       content: '📭';
@@ -464,7 +515,6 @@
       border: 1px solid transparent;
       border-radius: 8px;
       font-size: 0.875rem;
-      font-weight: 500;
       min-height: auto;
       box-shadow: none;
     }
@@ -474,14 +524,12 @@
       color: var(--text);
       border-color: var(--border);
       transform: scale(1.08);
-      box-shadow: var(--shadow-xs);
     }
     .actions .delete-btn:hover {
       background: var(--expense-soft);
       color: var(--expense);
       border-color: #fee2e2;
     }
-    .actions button:active { transform: scale(0.95); }
 
     /* ============ КНОПКА ПОКАЗАТЬ ЕЩЁ ============ */
     .load-more-wrap {
@@ -495,15 +543,8 @@
       background: var(--surface);
       color: var(--text);
       border: 1px solid var(--border-strong);
-      box-shadow: var(--shadow-xs);
       padding: 10px 28px;
       min-height: 44px;
-      font-size: 0.875rem;
-    }
-    .load-more-wrap button:hover {
-      background: var(--surface);
-      border-color: #9ca3af;
-      box-shadow: var(--shadow-sm);
     }
 
     /* ============ БЕЙДЖ РЕДАКТИРОВАНИЯ ============ */
@@ -547,19 +588,12 @@
       font-weight: 500;
       color: var(--text);
       border-left: 4px solid var(--accent);
-      backdrop-filter: blur(8px);
     }
     .toast.success { border-left-color: var(--income); }
     .toast.error { border-left-color: var(--expense); }
     .toast.info { border-left-color: #3b82f6; }
-
     .toast-icon { font-size: 1.125rem; line-height: 1.4; }
-    .toast.success .toast-icon { color: var(--income); }
-    .toast.error .toast-icon { color: var(--expense); }
-    .toast.info .toast-icon { color: #3b82f6; }
-
     .toast-message { flex: 1; word-break: break-word; line-height: 1.4; }
-
     .toast.hiding { animation: slideOut 0.3s ease forwards; }
 
     /* ============ АДАПТИВ ============ */
@@ -572,6 +606,7 @@
       .report-item .value { font-size: 1.5rem; }
       .card { padding: 20px; border-radius: var(--radius); }
       .page-header { margin-bottom: 24px; padding-bottom: 18px; }
+      .login-card { padding: 28px 24px; }
 
       th:nth-child(1), td:nth-child(1) { display: none; }
       th:nth-child(6), td:nth-child(6) { display: none; }
@@ -582,8 +617,6 @@
 
       .toast-container { top: 12px; right: 12px; left: 12px; }
       .toast { min-width: auto; width: 100%; }
-
-      .report-item { padding: 18px; }
     }
 
     @media (max-width: 380px) {
@@ -601,148 +634,163 @@
 </head>
 <body>
 
-<!-- Контейнер для Toast-уведомлений -->
 <div id="toastContainer" class="toast-container"></div>
 
-<div class="container">
-
-  <!-- ЗАГОЛОВОК -->
-  <div class="page-header">
-    <div>
-      <div class="page-title">Учёт приходов и расходов</div>
-      <div class="page-subtitle">Финансовый реестр операций</div>
+<!-- ============ ЭКРАН ВХОДА ============ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">🔒</div>
+      <div class="login-title">Вход в систему</div>
+      <div class="login-subtitle">Введите пароль для доступа к данным</div>
     </div>
+    <div id="loginError" class="login-error"></div>
+    <form class="login-form" id="loginForm">
+      <div class="field">
+        <label>Пароль</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+      <button type="submit" id="loginBtn">Войти</button>
+    </form>
   </div>
+</div>
 
-  <!-- ФОРМА -->
-  <div class="card">
-    <div class="card-header">
-      <div class="card-title" id="formTitle">Новая запись</div>
+<!-- ============ ПРИЛОЖЕНИЕ ============ -->
+<div id="app">
+  <div class="container">
+
+    <div class="page-header">
+      <div>
+        <div class="page-title">Учёт приходов и расходов</div>
+        <div class="page-subtitle">Финансовый реестр операций</div>
+      </div>
+      <div class="user-info">
+        <button class="logout-btn" id="logoutBtn">Выйти</button>
+      </div>
     </div>
-    <form id="addForm">
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title" id="formTitle">Новая запись</div>
+      </div>
+      <form id="addForm">
+        <div class="row">
+          <div class="field">
+            <label>Месяц</label>
+            <select id="month" required><option value="">— выберите —</option></select>
+          </div>
+          <div class="field">
+            <label>Дата</label>
+            <input type="date" id="date" required>
+          </div>
+          <div class="field">
+            <label>Тип операции</label>
+            <select id="type" required>
+              <option value="income">Приход</option>
+              <option value="expense">Расход</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Статья</label>
+            <input type="text" id="category" list="category-list" placeholder="Зарплата, аренда…" required>
+            <datalist id="category-list"></datalist>
+          </div>
+          <div class="field">
+            <label>Сумма, ₽</label>
+            <input type="number" id="amount" step="0.01" min="0" placeholder="0.00" required>
+          </div>
+          <div class="field" style="flex:2;">
+            <label>Назначение</label>
+            <input type="text" id="description" placeholder="Комментарий к операции">
+          </div>
+          <button type="submit" id="submitBtn">Добавить</button>
+          <button type="button" class="secondary" id="cancelEditBtn" style="display:none;">Отмена</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title">Фильтры</div></div>
       <div class="row">
         <div class="field">
-          <label>Месяц</label>
-          <select id="month" required>
-            <option value="">— выберите —</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Дата</label>
-          <input type="date" id="date" required>
-        </div>
-        <div class="field">
           <label>Тип операции</label>
-          <select id="type" required>
-            <option value="income">Приход</option>
-            <option value="expense">Расход</option>
+          <select id="filterType">
+            <option value="all">Все</option>
+            <option value="income">Только приходы</option>
+            <option value="expense">Только расходы</option>
           </select>
         </div>
         <div class="field">
           <label>Статья</label>
-          <input type="text" id="category" list="category-list" placeholder="Зарплата, аренда…" required>
-          <datalist id="category-list"></datalist>
+          <select id="filterCategory"><option value="all">Все статьи</option></select>
         </div>
-        <div class="field">
-          <label>Сумма, ₽</label>
-          <input type="number" id="amount" step="0.01" min="0" placeholder="0.00" required>
+        <div class="field"><label>Дата от</label><input type="date" id="filterDateFrom"></div>
+        <div class="field"><label>Дата до</label><input type="date" id="filterDateTo"></div>
+        <button class="secondary" id="resetFilters">Сбросить</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Отчёт за период</div>
+        <button class="success" id="exportBtn">Экспорт в Excel</button>
+      </div>
+      <div class="report">
+        <div class="report-item income-item">
+          <div class="label">Приходы</div>
+          <div class="value income" id="reportIncome">0,00</div>
         </div>
-        <div class="field" style="flex:2;">
-          <label>Назначение</label>
-          <input type="text" id="description" placeholder="Комментарий к операции">
+        <div class="report-item expense-item">
+          <div class="label">Расходы</div>
+          <div class="value expense" id="reportExpense">0,00</div>
         </div>
-        <button type="submit" id="submitBtn">Добавить</button>
-        <button type="button" class="secondary" id="cancelEditBtn" style="display:none;">Отмена</button>
+        <div class="report-item">
+          <div class="label">Баланс</div>
+          <div class="value" id="reportBalance">0,00</div>
+        </div>
       </div>
-    </form>
-  </div>
+    </div>
 
-  <!-- ФИЛЬТРЫ -->
-  <div class="card">
-    <div class="card-header">
-      <div class="card-title">Фильтры</div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Реестр операций</div></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Месяц</th>
+              <th>Дата</th>
+              <th>Тип</th>
+              <th>Статья</th>
+              <th class="num">Сумма, ₽</th>
+              <th>Назначение</th>
+              <th style="width:80px;"></th>
+              <th>Заметка</th>
+            </tr>
+          </thead>
+          <tbody id="recordsBody"></tbody>
+        </table>
+        <div class="empty" id="emptyMsg" style="display:none;">Записей нет</div>
+        <div class="load-more-wrap" id="loadMoreWrap" style="display:none;">
+          <button class="secondary" id="loadMoreBtn">Показать ещё 50</button>
+        </div>
+      </div>
     </div>
-    <div class="row">
-      <div class="field">
-        <label>Тип операции</label>
-        <select id="filterType">
-          <option value="all">Все</option>
-          <option value="income">Только приходы</option>
-          <option value="expense">Только расходы</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Статья</label>
-        <select id="filterCategory">
-          <option value="all">Все статьи</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Дата от</label>
-        <input type="date" id="filterDateFrom">
-      </div>
-      <div class="field">
-        <label>Дата до</label>
-        <input type="date" id="filterDateTo">
-      </div>
-      <button class="secondary" id="resetFilters">Сбросить</button>
-    </div>
-  </div>
 
-  <!-- ОТЧЁТ -->
-  <div class="card">
-    <div class="card-header">
-      <div class="card-title">Отчёт за период</div>
-      <button class="success" id="exportBtn">Экспорт в Excel</button>
-    </div>
-    <div class="report">
-      <div class="report-item income-item">
-        <div class="label">Приходы</div>
-        <div class="value income" id="reportIncome">0,00</div>
-      </div>
-      <div class="report-item expense-item">
-        <div class="label">Расходы</div>
-        <div class="value expense" id="reportExpense">0,00</div>
-      </div>
-      <div class="report-item">
-        <div class="label">Баланс</div>
-        <div class="value" id="reportBalance">0,00</div>
-      </div>
-    </div>
   </div>
-
-  <!-- ТАБЛИЦА -->
-  <div class="card">
-    <div class="card-header">
-      <div class="card-title">Реестр операций</div>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Месяц</th>
-            <th>Дата</th>
-            <th>Тип</th>
-            <th>Статья</th>
-            <th class="num">Сумма, ₽</th>
-            <th>Назначение</th>
-            <th style="width:80px;"></th>
-            <th>Заметка</th>
-          </tr>
-        </thead>
-        <tbody id="recordsBody"></tbody>
-      </table>
-      <div class="empty" id="emptyMsg" style="display:none;">Записей нет</div>
-      <div class="load-more-wrap" id="loadMoreWrap" style="display:none;">
-        <button class="secondary" id="loadMoreBtn">Показать ещё 50</button>
-      </div>
-    </div>
-  </div>
-
 </div>
 
 <script>
-// ========== FIREBASE (ВАШИ КЛЮЧИ) ==========
+// ============================================
+// 🔐 ПАРОЛЬ ДЛЯ ВХОДА
+// Измените на свой. Запомните его!
+// ============================================
+const ACCESS_PASSWORD = 'lera1569';
+
+// Время жизни сессии в миллисекундах (30 дней)
+const SESSION_DURATION = 30 * 24 * 60 * 60 * 1000;
+const SESSION_KEY = 'finance_session_until';
+
+// ========== FIREBASE ==========
 const firebaseConfig = {
   apiKey: "AIzaSyDdm0kaIesCu4CBennxPVoPhXwyAyAiwIg",
   authDomain: "chek-listdb.firebaseapp.com",
@@ -755,15 +803,10 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// ========== ОФЛАЙН-РЕЖИМ ==========
-db.enablePersistence({ synchronizeTabs: true })
-  .catch(err => {
-    if (err.code === 'failed-precondition') {
-      console.warn('Офлайн-режим: открыто несколько вкладок, работает только в одной.');
-    } else if (err.code === 'unimplemented') {
-      console.warn('Офлайн-режим: браузер не поддерживает.');
-    }
-  });
+db.enablePersistence({ synchronizeTabs: true }).catch(err => {
+  if (err.code === 'failed-precondition') console.warn('Офлайн: несколько вкладок.');
+  else if (err.code === 'unimplemented') console.warn('Офлайн: не поддерживается.');
+});
 
 const COLLECTION = 'finance_records';
 
@@ -774,59 +817,108 @@ let editingId = null;
 let limitCount = 50;
 const LIMIT_STEP = 50;
 let lastDocCount = 0;
+let isAuthenticated = false;
 
-// ========== TOAST УВЕДОМЛЕНИЯ ==========
+// ========== TOAST ==========
 function showToast(message, type = 'info') {
   const container = document.getElementById('toastContainer');
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
-
   let icon = 'ℹ️';
   if (type === 'success') icon = '✅';
   if (type === 'error') icon = '❌';
-
-  toast.innerHTML = `
-    <span class="toast-icon">${icon}</span>
-    <span class="toast-message">${message}</span>
-  `;
-
+  toast.innerHTML = `<span class="toast-icon">${icon}</span><span class="toast-message">${message}</span>`;
   container.appendChild(toast);
-
   setTimeout(() => {
     toast.classList.add('hiding');
     setTimeout(() => toast.remove(), 300);
   }, 3500);
 }
 
-// ========== ФОРМАТ ЧИСЛА ==========
-const numberFormatter = new Intl.NumberFormat('ru-RU', {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2
+// ========== ПРОВЕРКА СЕССИИ ==========
+function isSessionValid() {
+  const until = Number(localStorage.getItem(SESSION_KEY) || 0);
+  return until > Date.now();
+}
+
+function startSession() {
+  localStorage.setItem(SESSION_KEY, String(Date.now() + SESSION_DURATION));
+}
+
+function endSession() {
+  localStorage.removeItem(SESSION_KEY);
+}
+
+// ========== ПОКАЗ / СКРЫТИЕ ЭКРАНОВ ==========
+function showLogin() {
+  isAuthenticated = false;
+  document.getElementById('loginScreen').classList.add('visible');
+  document.getElementById('app').classList.remove('visible');
+  if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+  allRecords = [];
+  setTimeout(() => document.getElementById('loginPassword').focus(), 100);
+}
+
+function showApp() {
+  isAuthenticated = true;
+  document.getElementById('loginScreen').classList.remove('visible');
+  document.getElementById('app').classList.add('visible');
+  populateMonthSelect();
+  document.getElementById('date').valueAsDate = new Date();
+  subscribeToRecords();
+}
+
+// ========== ФОРМА ВХОДА ==========
+document.getElementById('loginForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const input = document.getElementById('loginPassword').value;
+  const errBox = document.getElementById('loginError');
+  errBox.classList.remove('visible');
+
+  if (input === ACCESS_PASSWORD) {
+    startSession();
+    document.getElementById('loginPassword').value = '';
+    showApp();
+    showToast('Добро пожаловать!', 'success');
+  } else {
+    errBox.textContent = 'Неверный пароль. Попробуйте ещё раз.';
+    errBox.classList.add('visible');
+    document.getElementById('loginPassword').value = '';
+    document.getElementById('loginPassword').focus();
+  }
 });
+
+// ========== ВЫХОД ==========
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  if (!confirm('Выйти из системы?')) return;
+  endSession();
+  showLogin();
+  showToast('Вы вышли из системы', 'info');
+});
+
+// ========== ФОРМАТ ЧИСЛА ==========
+const numberFormatter = new Intl.NumberFormat('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 function fmt(n) { return numberFormatter.format(Number(n) || 0); }
 
 // ========== МЕСЯЦЫ ==========
 function populateMonthSelect() {
   const select = document.getElementById('month');
-  const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь',
-                      'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+  const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
   const currentYear = new Date().getFullYear();
   const years = [currentYear, currentYear - 1, currentYear - 2, currentYear + 1];
-
   let html = '<option value="">— выберите —</option>';
   years.forEach((y, idx) => {
     const label = idx === 0 ? `${y} — текущий` : `${y}`;
     html += `<optgroup label="${label}">`;
-    monthNames.forEach(m => {
-      html += `<option value="${m} ${y}">${m} ${y}</option>`;
-    });
+    monthNames.forEach(m => { html += `<option value="${m} ${y}">${m} ${y}</option>`; });
     html += `</optgroup>`;
   });
   select.innerHTML = html;
 }
 
-// ========== FIREBASE REALTIME С ЛИМИТОМ ==========
+// ========== FIREBASE REALTIME ==========
 function subscribeToRecords() {
+  if (!isAuthenticated) return;
   if (unsubscribe) unsubscribe();
   unsubscribe = db.collection(COLLECTION)
     .orderBy('date', 'desc')
@@ -850,13 +942,11 @@ function populateCategoryDatalist() {
   datalist.innerHTML = categories.map(c => `<option value="${c}">`).join('');
 }
 
-// ========== ФИЛЬТР СТАТЕЙ ==========
 function populateCategoryFilter() {
   const select = document.getElementById('filterCategory');
   const current = select.value;
   const categories = [...new Set(allRecords.map(r => r.category).filter(Boolean))].sort();
-  select.innerHTML = '<option value="all">Все статьи</option>' +
-    categories.map(c => `<option value="${c}">${c}</option>`).join('');
+  select.innerHTML = '<option value="all">Все статьи</option>' + categories.map(c => `<option value="${c}">${c}</option>`).join('');
   if (categories.includes(current)) select.value = current;
 }
 
@@ -866,7 +956,6 @@ function getFiltered() {
   const category = document.getElementById('filterCategory').value;
   const dateFrom = document.getElementById('filterDateFrom').value;
   const dateTo = document.getElementById('filterDateTo').value;
-
   return allRecords.filter(r => {
     if (type !== 'all' && r.type !== type) return false;
     if (category !== 'all' && r.category !== category) return false;
@@ -878,9 +967,7 @@ function getFiltered() {
 
 // ========== ЭКРАНИРОВАНИЕ ==========
 function esc(s) {
-  return String(s == null ? '' : s)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
 // ========== ОТРИСОВКА ==========
@@ -898,9 +985,7 @@ function render() {
     emptyMsg.style.display = 'none';
     tbody.innerHTML = filtered.map(r => {
       const isIncome = r.type === 'income';
-      const badge = isIncome
-        ? '<span class="badge badge-income">Приход</span>'
-        : '<span class="badge badge-expense">Расход</span>';
+      const badge = isIncome ? '<span class="badge badge-income">Приход</span>' : '<span class="badge badge-expense">Расход</span>';
       return `
         <tr>
           <td>${esc(r.month) || '—'}</td>
@@ -914,21 +999,12 @@ function render() {
             <button class="delete-btn" onclick="deleteRecord('${r.id}')" title="Удалить">🗑️</button>
           </td>
           <td>
-            <input type="text" class="note-input" 
-                   value="${esc(r.note || '')}" 
-                   placeholder="Добавить заметку..."
-                   onblur="updateNote('${r.id}', this.value)"
-                   onkeydown="if(event.key==='Enter'){this.blur();}">
+            <input type="text" class="note-input" value="${esc(r.note || '')}" placeholder="Добавить заметку..." onblur="updateNote('${r.id}', this.value)" onkeydown="if(event.key==='Enter'){this.blur();}">
           </td>
         </tr>
       `;
     }).join('');
-
-    if (lastDocCount >= limitCount) {
-      loadMoreWrap.style.display = 'flex';
-    } else {
-      loadMoreWrap.style.display = 'none';
-    }
+    loadMoreWrap.style.display = (lastDocCount >= limitCount) ? 'flex' : 'none';
   }
 
   const income = filtered.filter(r => r.type === 'income').reduce((s, r) => s + Number(r.amount), 0);
@@ -940,10 +1016,11 @@ function render() {
 
 // ========== СОХРАНЕНИЕ ЗАМЕТКИ ==========
 window.updateNote = async (id, text) => {
+  if (!isAuthenticated) return;
   try {
     await db.collection(COLLECTION).doc(id).update({ note: text.trim() });
   } catch (err) {
-    console.error('Ошибка сохранения заметки:', err);
+    console.error('Ошибка заметки:', err);
     showToast('Не удалось сохранить заметку: ' + err.message, 'error');
   }
 };
@@ -958,6 +1035,7 @@ document.getElementById('loadMoreBtn').addEventListener('click', () => {
 // ========== ДОБАВЛЕНИЕ / РЕДАКТИРОВАНИЕ ==========
 document.getElementById('addForm').addEventListener('submit', async (e) => {
   e.preventDefault();
+  if (!isAuthenticated) return;
   const data = {
     month: document.getElementById('month').value,
     date: document.getElementById('date').value,
@@ -966,7 +1044,6 @@ document.getElementById('addForm').addEventListener('submit', async (e) => {
     amount: parseFloat(document.getElementById('amount').value),
     description: document.getElementById('description').value.trim()
   };
-
   try {
     if (editingId) {
       data.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
@@ -990,22 +1067,18 @@ document.getElementById('addForm').addEventListener('submit', async (e) => {
 window.startEdit = (id) => {
   const r = allRecords.find(x => x.id === id);
   if (!r) return;
-
   const monthSelect = document.getElementById('month');
   if (r.month && ![...monthSelect.options].some(o => o.value === r.month)) {
     const opt = document.createElement('option');
-    opt.value = r.month;
-    opt.textContent = r.month;
+    opt.value = r.month; opt.textContent = r.month;
     monthSelect.appendChild(opt);
   }
   monthSelect.value = r.month || '';
-
   document.getElementById('date').value = r.date || '';
   document.getElementById('type').value = r.type || 'income';
   document.getElementById('category').value = r.category || '';
   document.getElementById('amount').value = r.amount != null ? r.amount : '';
   document.getElementById('description').value = r.description || '';
-
   editingId = id;
   document.getElementById('formTitle').innerHTML = 'Редактирование <span class="editing-badge">изменение</span>';
   document.getElementById('submitBtn').textContent = 'Сохранить';
@@ -1026,6 +1099,7 @@ document.getElementById('cancelEditBtn').addEventListener('click', cancelEdit);
 
 // ========== УДАЛЕНИЕ ==========
 window.deleteRecord = async (id) => {
+  if (!isAuthenticated) return;
   if (!confirm('Удалить запись?')) return;
   try {
     await db.collection(COLLECTION).doc(id).delete();
@@ -1040,31 +1114,16 @@ window.deleteRecord = async (id) => {
 // ========== ВЫГРУЗКА В EXCEL ==========
 document.getElementById('exportBtn').addEventListener('click', () => {
   try {
-    if (typeof XLSX === 'undefined') {
-      showToast('Библиотека Excel не загрузилась. Проверьте интернет.', 'error');
-      return;
-    }
-
+    if (typeof XLSX === 'undefined') { showToast('Библиотека Excel не загрузилась.', 'error'); return; }
     const filtered = getFiltered();
-    if (filtered.length === 0) {
-      showToast('Нет данных для выгрузки (проверьте фильтры)', 'info');
-      return;
-    }
-
+    if (filtered.length === 0) { showToast('Нет данных для выгрузки (проверьте фильтры)', 'info'); return; }
     const aoa = [['Месяц', 'Дата', 'Тип', 'Статья', 'Сумма', 'Назначение', 'Заметка']];
     filtered.forEach(r => {
-      aoa.push([
-        r.month || '', r.date || '',
-        r.type === 'income' ? 'Приход' : 'Расход',
-        r.category || '', Number(r.amount) || 0, r.description || '', r.note || ''
-      ]);
+      aoa.push([r.month || '', r.date || '', r.type === 'income' ? 'Приход' : 'Расход', r.category || '', Number(r.amount) || 0, r.description || '', r.note || '']);
     });
-
     const income = filtered.filter(r => r.type === 'income').reduce((s, r) => s + Number(r.amount), 0);
     const expense = filtered.filter(r => r.type === 'expense').reduce((s, r) => s + Number(r.amount), 0);
-
     aoa.push([], ['', '', '', 'Приходы:', income], ['', '', '', 'Расходы:', expense], ['', '', '', 'Баланс:', income - expense]);
-
     const ws = XLSX.utils.aoa_to_sheet(aoa);
     const range = XLSX.utils.decode_range(ws['!ref']);
     for (let r = 1; r <= range.e.r; r++) {
@@ -1072,7 +1131,6 @@ document.getElementById('exportBtn').addEventListener('click', () => {
       if (cell && typeof cell.v === 'number') cell.z = '#,##0.00';
     }
     ws['!cols'] = [{ wch: 16 }, { wch: 12 }, { wch: 10 }, { wch: 22 }, { wch: 16 }, { wch: 32 }, { wch: 32 }];
-
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Отчёт');
     const dateStr = new Date().toISOString().slice(0, 10);
@@ -1097,9 +1155,11 @@ document.getElementById('resetFilters').addEventListener('click', () => {
 });
 
 // ========== СТАРТ ==========
-populateMonthSelect();
-document.getElementById('date').valueAsDate = new Date();
-subscribeToRecords();
+if (isSessionValid()) {
+  showApp();
+} else {
+  showLogin();
+}
 </script>
 </body>
 </html>
