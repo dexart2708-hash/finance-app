@@ -1005,23 +1005,21 @@ async function startEnrollment(user) {
   try {
     console.log('[2FA] Начинаем регистрацию TOTP...');
     console.log('[2FA] User email:', user?.email);
-
-    // ✅ Правильный вызов в compat-версии Firebase
-    const authMod = window.ModAuth.getAuth(firebase.app());
-    const mfUser = window.ModAuth.multiFactor(authMod.currentUser);
-    const multiFactorSession = await mfUser.getSession();
-    console.log('[2FA] Сессия MFA получена');
-
+    
+    // ✅ Правильный способ получения сессии через модульный SDK
+    const auth = firebase.auth(); // compat-инстанс
+    const multiFactorSession = await window.ModAuth.multiFactor(auth).getSession();
+    
+    // ✅ Передаём объект сессии в генератор секрета
     totpSecret = await window.ModAuth.TotpMultiFactorGenerator.generateSecret(multiFactorSession);
     console.log('[2FA] Секрет сгенерирован:', totpSecret.secretKey);
-
     const qrContainer = document.getElementById('qrcode');
     qrContainer.innerHTML = '';
     const qrUrl = totpSecret.generateQrCodeUrl(user.email, 'Finance Valeeryyy');
     new QRCode(qrContainer, { text: qrUrl, width: 180, height: 180 });
-
+    
     document.getElementById('totpSecret').textContent = totpSecret.secretKey;
-
+    
     showScreen('enroll');
     document.getElementById('enrollCode').value = '';
     document.getElementById('enrollError').classList.remove('visible');
