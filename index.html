@@ -216,7 +216,7 @@
       font-weight: 400;
     }
     
-    /* ============ ПОЛЬЗОВАТЕЛЬ (АВАТАР + КНОПКА) ============ */
+    /* ============ ПОЛЬЗОВАТЕЛЬ (АВАТАР + ИМЯ + КНОПКА) ============ */
     .user-info { 
       display: flex; 
       align-items: center; 
@@ -232,10 +232,39 @@
       background-color: var(--surface-alt);
       transition: transform var(--transition-fast), box-shadow var(--transition-fast);
       cursor: pointer;
+      flex-shrink: 0;
     }
     .user-avatar:hover {
       transform: scale(1.08);
       box-shadow: var(--shadow-md);
+    }
+
+    /* Блок с именем */
+    .user-name-wrap {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      line-height: 1.25;
+      margin-right: 4px;
+    }
+    .user-name {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      white-space: nowrap;
+    }
+    .user-role {
+      font-size: 0.6875rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 2px;
+      white-space: nowrap;
     }
 
     /* ============ АНИМАЦИИ ============ */
@@ -521,6 +550,7 @@
       min-height: 40px;
       font-size: 0.8125rem;
       box-shadow: var(--shadow-xs);
+      flex-shrink: 0;
     }
     button.logout-btn:hover {
       background: var(--expense-soft);
@@ -784,6 +814,8 @@
       
       .user-info { gap: 10px; }
       .user-avatar { width: 42px; height: 42px; border-width: 2px; }
+      .user-role { display: none; } /* Скрываем роль на мобильных */
+      .user-name { font-size: 0.875rem; }
 
       th:nth-child(1), td:nth-child(1) { display: none; }
       th:nth-child(6), td:nth-child(6) { display: none; }
@@ -844,6 +876,11 @@
       <div class="user-info">
         <!-- ЗДЕСЬ ВАША ФОТОГРАФИЯ. Замените avatar.jpg на имя вашего файла -->
         <img src="avatar.jpg" alt="Пользователь" class="user-avatar" onerror="this.src='https://i.pravatar.cc/150?img=44'">
+        <!-- КРАСИВАЯ ПОДПИСЬ -->
+        <div class="user-name-wrap">
+          <div class="user-name">Валерия Александрова</div>
+          <div class="user-role">Владелец</div>
+        </div>
         <button class="logout-btn" id="logoutBtn">Выйти</button>
       </div>
     </div>
