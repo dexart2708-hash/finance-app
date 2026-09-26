@@ -70,7 +70,6 @@
     }
 
     body {
-      /* Основной градиент + мягкие цветные пятна по углам */
       background:
         radial-gradient(ellipse at top left,    rgba(5, 150, 105, 0.06) 0%, transparent 55%),
         radial-gradient(ellipse at bottom right, rgba(220, 38, 38, 0.05) 0%, transparent 55%),
@@ -84,7 +83,6 @@
       padding-left: calc(24px + env(safe-area-inset-left));
     }
 
-    /* ============ ВАЛЮТНЫЙ ФОН ============ */
     body::before {
       content: '';
       position: fixed;
@@ -94,10 +92,9 @@
       background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='340'%20height='340'%20viewBox='0%200%20340%20340'%3E%3Cg%20fill='%230f172a'%20font-family='Georgia,serif'%20font-weight='700'%3E%3Ctext%20x='25'%20y='70'%20font-size='54'%20transform='rotate(-15%2025%2070)'%3E%24%3C/text%3E%3Ctext%20x='220'%20y='55'%20font-size='42'%20transform='rotate(18%20220%2055)'%3E%E2%82%AC%3C/text%3E%3Ctext%20x='100'%20y='185'%20font-size='50'%20transform='rotate(-6%20100%20185)'%3E%E2%82%BD%3C/text%3E%3Ctext%20x='255'%20y='210'%20font-size='46'%20transform='rotate(12%20255%20210)'%3E%C2%A3%3C/text%3E%3Ctext%20x='45'%20y='305'%20font-size='44'%20transform='rotate(22%2045%20305)'%3E%C2%A5%3C/text%3E%3Ctext%20x='225'%20y='320'%20font-size='40'%20transform='rotate(-18%20225%20320)'%3E%E2%82%A3%3C/text%3E%3C/g%3E%3C/svg%3E");
       background-repeat: repeat;
       background-size: 340px 340px;
-      opacity: 0.09;
+      opacity: 0.055;
     }
 
-    /* Лёгкое затемнение сверху вниз для контраста карточек */
     body::after {
       content: '';
       position: fixed;
@@ -218,7 +215,28 @@
       margin-top: 4px;
       font-weight: 400;
     }
-    .user-info { display: flex; align-items: center; gap: 12px; }
+    
+    /* ============ ПОЛЬЗОВАТЕЛЬ (АВАТАР + КНОПКА) ============ */
+    .user-info { 
+      display: flex; 
+      align-items: center; 
+      gap: 14px; 
+    }
+    .user-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid rgba(255, 255, 255, 0.9);
+      box-shadow: var(--shadow-sm);
+      background-color: var(--surface-alt);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+      cursor: pointer;
+    }
+    .user-avatar:hover {
+      transform: scale(1.08);
+      box-shadow: var(--shadow-md);
+    }
 
     /* ============ АНИМАЦИИ ============ */
     @keyframes fadeInUp {
@@ -763,6 +781,9 @@
 
       .card-header { gap: 14px; }
       .search-wrap { max-width: 100%; }
+      
+      .user-info { gap: 10px; }
+      .user-avatar { width: 42px; height: 42px; border-width: 2px; }
 
       th:nth-child(1), td:nth-child(1) { display: none; }
       th:nth-child(6), td:nth-child(6) { display: none; }
@@ -821,6 +842,8 @@
         <div class="page-subtitle">Финансовый реестр операций</div>
       </div>
       <div class="user-info">
+        <!-- ЗДЕСЬ ВАША ФОТОГРАФИЯ. Замените avatar.jpg на имя вашего файла -->
+        <img src="avatar.jpg" alt="Пользователь" class="user-avatar" onerror="this.src='https://i.pravatar.cc/150?img=44'">
         <button class="logout-btn" id="logoutBtn">Выйти</button>
       </div>
     </div>
@@ -951,7 +974,7 @@
 // 🔐 ПАРОЛЬ ДЛЯ ВХОДА
 // Измените на свой. Запомните его!
 // ============================================
-const ACCESS_PASSWORD = 'lera1569';
+const ACCESS_PASSWORD = 'finance2026';
 
 // Время жизни сессии (30 дней)
 const SESSION_DURATION = 30 * 24 * 60 * 60 * 1000;
