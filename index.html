@@ -15,53 +15,96 @@
   <!-- Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --bg:            #f5f6f8;
+      --bg:            #f4f5f7;
+      --bg-gradient:   linear-gradient(180deg, #f8f9fb 0%, #f4f5f7 100%);
       --surface:       #ffffff;
       --surface-alt:   #fafbfc;
-      --border:        #e5e7eb;
+      --surface-hover: #f8fafc;
+      --border:        #e8eaed;
       --border-strong: #d1d5db;
 
-      --text:          #111827;
-      --text-muted:    #6b7280;
-      --text-subtle:   #9ca3af;
+      --text:          #0f172a;
+      --text-muted:    #64748b;
+      --text-subtle:   #94a3b8;
 
-      --accent:        #111827;
-      --accent-hover:  #1f2937;
-      --accent-soft:   #f3f4f6;
+      --accent:        #0f172a;
+      --accent-hover:  #1e293b;
+      --accent-soft:   #f1f5f9;
 
-      --income:        #047857;
-      --expense:       #b91c1c;
+      --income:        #059669;
+      --income-soft:   #ecfdf5;
+      --expense:       #dc2626;
+      --expense-soft:  #fef2f2;
 
-      --radius:        8px;
-      --radius-sm:     6px;
+      --radius-sm:     8px;
+      --radius:        12px;
+      --radius-lg:     16px;
 
-      --shadow-sm:     0 1px 2px rgba(17, 24, 39, 0.04);
-      --shadow:        0 4px 6px -1px rgba(17, 24, 39, 0.05), 0 2px 4px -1px rgba(17, 24, 39, 0.03);
-      --shadow-toast:  0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xs:     0 1px 2px rgba(15, 23, 42, 0.04);
+      --shadow-sm:     0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+      --shadow-md:     0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -1px rgba(15, 23, 42, 0.04);
+      --shadow-lg:     0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -2px rgba(15, 23, 42, 0.04);
+      --shadow-xl:     0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 10px 10px -5px rgba(15, 23, 42, 0.04);
+      --shadow-toast:  0 20px 25px -5px rgba(15, 23, 42, 0.15), 0 8px 10px -6px rgba(15, 23, 42, 0.1);
 
       --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+      --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition:      0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     html, body {
       font-family: var(--font);
-      background: var(--bg);
+      background: var(--bg-gradient);
+      background-attachment: fixed;
       color: var(--text);
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       font-feature-settings: 'cv02','cv03','cv04','cv11','tnum';
       line-height: 1.5;
-      /* Safe Area для iPhone */
+      min-height: 100vh;
       padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     }
 
-    body { padding: 32px 24px; }
+    body { padding: 40px 24px; }
     .container { max-width: 1280px; margin: 0 auto; }
+
+    /* ============ АНИМАЦИИ ============ */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes slideIn {
+      from { transform: translateX(110%); opacity: 0; }
+      to   { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOut {
+      from { transform: translateX(0); opacity: 1; }
+      to   { transform: translateX(110%); opacity: 0; }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%      { opacity: 0.6; }
+    }
+
+    .animate-in { animation: fadeInUp var(--transition-slow) both; }
+    .animate-in:nth-child(1) { animation-delay: 0ms; }
+    .animate-in:nth-child(2) { animation-delay: 60ms; }
+    .animate-in:nth-child(3) { animation-delay: 120ms; }
+    .animate-in:nth-child(4) { animation-delay: 180ms; }
+    .animate-in:nth-child(5) { animation-delay: 240ms; }
+    .animate-in:nth-child(6) { animation-delay: 300ms; }
 
     /* ============ ЗАГОЛОВОК ============ */
     .page-header {
@@ -70,21 +113,41 @@
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 12px;
-      margin-bottom: 28px;
-      padding-bottom: 20px;
+      margin-bottom: 32px;
+      padding-bottom: 24px;
       border-bottom: 1px solid var(--border);
+      animation: fadeInUp var(--transition-slow) both;
     }
-    .page-title { font-size: 1.375rem; font-weight: 600; letter-spacing: -0.01em; }
-    .page-subtitle { font-size: 0.8125rem; color: var(--text-muted); margin-top: 2px; }
+    .page-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .page-subtitle {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-weight: 400;
+    }
 
     /* ============ КАРТОЧКИ ============ */
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px;
-      margin-bottom: 16px;
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      margin-bottom: 20px;
       box-shadow: var(--shadow-sm);
+      transition: box-shadow var(--transition), transform var(--transition), border-color var(--transition);
+      animation: fadeInUp var(--transition-slow) both;
+    }
+    .card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: #dde1e6;
     }
     .card-header {
       display: flex;
@@ -92,19 +155,40 @@
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 12px;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
-    .card-title { font-size: 0.9375rem; font-weight: 600; color: var(--text); }
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title::before {
+      content: '';
+      width: 3px;
+      height: 16px;
+      background: linear-gradient(180deg, #0f172a 0%, #475569 100%);
+      border-radius: 2px;
+    }
 
     /* ============ ПОЛЯ ============ */
     .row { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end; }
     .field { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 160px; }
 
-    label { font-size: 0.75rem; font-weight: 500; color: var(--text-muted); letter-spacing: 0.01em; }
+    label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
 
     input, select {
       font-family: var(--font);
-      font-size: 1rem; /* 16px предотвращает зум на iOS */
+      font-size: 1rem;
       font-weight: 400;
       padding: 12px 14px;
       color: var(--text);
@@ -112,14 +196,15 @@
       border: 1px solid var(--border-strong);
       border-radius: var(--radius-sm);
       outline: none;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
       width: 100%;
-      min-height: 48px; /* Удобный размер для пальцев */
+      min-height: 48px;
     }
     input:hover, select:hover { border-color: #9ca3af; }
     input:focus, select:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.08);
+      box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.08);
+      background: var(--surface);
     }
     input::placeholder { color: var(--text-subtle); }
     input[type="number"] { font-variant-numeric: tabular-nums; }
@@ -136,66 +221,107 @@
     button {
       font-family: var(--font);
       font-size: 0.875rem;
-      font-weight: 500;
-      padding: 12px 20px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      padding: 12px 22px;
       border: 1px solid transparent;
       border-radius: var(--radius-sm);
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all var(--transition-fast);
       white-space: nowrap;
-      background: var(--accent);
+      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
       color: #fff;
       min-height: 48px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
     }
-    button:hover { background: var(--accent-hover); }
-    button:active { transform: scale(0.98); }
+    button::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+      pointer-events: none;
+    }
+    button:hover {
+      background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
+    }
+    button:hover::after { opacity: 1; }
+    button:active {
+      transform: translateY(0) scale(0.98);
+      box-shadow: var(--shadow-xs);
+    }
 
     button.secondary {
       background: var(--surface);
       color: var(--text);
       border-color: var(--border-strong);
+      box-shadow: var(--shadow-xs);
     }
-    button.secondary:hover { background: var(--accent-soft); border-color: #9ca3af; }
+    button.secondary:hover {
+      background: var(--surface-hover);
+      border-color: #9ca3af;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+    button.secondary:active { transform: translateY(0) scale(0.98); }
 
     button.success {
       background: var(--surface);
       color: var(--income);
-      border-color: #a7d3c0;
+      border-color: #a7f3d0;
+      box-shadow: var(--shadow-xs);
     }
-    button.success:hover { background: #ecfdf5; border-color: #6ee7b7; }
+    button.success:hover {
+      background: var(--income-soft);
+      border-color: #6ee7b7;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
 
     /* ============ ТАБЛИЦА ============ */
     .table-wrap {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
+      border-radius: var(--radius);
       overflow: hidden;
+      box-shadow: var(--shadow-xs);
     }
     table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
 
     thead th {
       background: var(--surface-alt);
-      font-weight: 500;
-      font-size: 0.75rem;
+      font-weight: 600;
+      font-size: 0.6875rem;
       color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.08em;
       text-align: left;
-      padding: 12px 16px;
+      padding: 14px 18px;
       border-bottom: 1px solid var(--border);
       white-space: nowrap;
     }
     tbody td {
-      padding: 14px 16px;
+      padding: 16px 18px;
       border-bottom: 1px solid var(--border);
       color: var(--text);
       vertical-align: middle;
+      transition: background var(--transition-fast);
+    }
+    tbody tr {
+      transition: background var(--transition-fast), transform var(--transition-fast);
+      animation: fadeIn var(--transition) both;
     }
     tbody tr:last-child td { border-bottom: none; }
-    tbody tr:hover { background: #fafbfc; }
+    tbody tr:hover { background: var(--surface-hover); }
+    tbody tr:hover td { color: var(--text); }
 
     td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
     .income  { color: var(--income);  font-weight: 600; }
@@ -205,58 +331,155 @@
       display: inline-block;
       font-size: 0.6875rem;
       font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 4px;
+      padding: 5px 12px;
+      border-radius: 6px;
       white-space: nowrap;
+      letter-spacing: 0.02em;
+      transition: transform var(--transition-fast);
     }
-    .badge-income  { background: #ecfdf5; color: #065f46; border: 1px solid #d1fae5; }
-    .badge-expense { background: #fef2f2; color: #991b1b; border: 1px solid #fee2e2; }
+    .badge:hover { transform: scale(1.05); }
+    .badge-income  { background: var(--income-soft); color: #065f46; border: 1px solid #d1fae5; }
+    .badge-expense { background: var(--expense-soft); color: #991b1b; border: 1px solid #fee2e2; }
 
     /* ============ ОТЧЁТ ============ */
     .report { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
     .report-item {
-      background: var(--surface-alt);
+      background: linear-gradient(180deg, var(--surface-alt) 0%, var(--surface) 100%);
       border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 20px;
+      border-radius: var(--radius);
+      padding: 24px;
+      transition: all var(--transition);
+      position: relative;
+      overflow: hidden;
     }
+    .report-item::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #cbd5e1 0%, #94a3b8 100%);
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+    .report-item:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: #dde1e6;
+    }
+    .report-item:hover::before { opacity: 1; }
+    .report-item.income-item::before { background: linear-gradient(90deg, #34d399 0%, #059669 100%); }
+    .report-item.expense-item::before { background: linear-gradient(90deg, #f87171 0%, #dc2626 100%); }
+
     .report-item .label {
-      font-size: 0.75rem; font-weight: 500; color: var(--text-muted);
-      text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 10px;
     }
     .report-item .value {
-      font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em;
-      font-variant-numeric: tabular-nums; line-height: 1.1;
+      font-size: 1.875rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+      color: var(--text);
+      transition: color var(--transition);
     }
     .report-item .value.income  { color: var(--income); }
     .report-item .value.expense { color: var(--expense); }
 
     /* ============ ПУСТОЕ СОСТОЯНИЕ ============ */
-    .empty { text-align: center; padding: 48px 20px; color: var(--text-muted); font-size: 0.875rem; }
+    .empty {
+      text-align: center;
+      padding: 56px 20px;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      animation: fadeIn var(--transition);
+    }
+    .empty::before {
+      content: '📭';
+      display: block;
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
 
     /* ============ ДЕЙСТВИЯ ============ */
-    .actions { display: flex; gap: 8px; justify-content: flex-end; }
+    .actions { display: flex; gap: 6px; justify-content: flex-end; }
     .actions button {
-      padding: 0; width: 36px; height: 36px;
-      display: inline-flex; align-items: center; justify-content: center;
-      background: transparent; color: var(--text-muted);
-      border: 1px solid transparent; border-radius: 4px;
-      font-size: 0.75rem; font-weight: 600;
+      padding: 0;
+      width: 34px; height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid transparent;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      min-height: auto;
+      box-shadow: none;
     }
-    .actions button:hover { background: var(--accent-soft); color: var(--text); border-color: var(--border); }
-    .actions .delete-btn:hover { background: #fef2f2; color: var(--expense); border-color: #fee2e2; }
+    .actions button::after { display: none; }
+    .actions button:hover {
+      background: var(--accent-soft);
+      color: var(--text);
+      border-color: var(--border);
+      transform: scale(1.08);
+      box-shadow: var(--shadow-xs);
+    }
+    .actions .delete-btn:hover {
+      background: var(--expense-soft);
+      color: var(--expense);
+      border-color: #fee2e2;
+    }
+    .actions button:active { transform: scale(0.95); }
 
+    /* ============ КНОПКА ПОКАЗАТЬ ЕЩЁ ============ */
+    .load-more-wrap {
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+      border-top: 1px solid var(--border);
+      background: var(--surface-alt);
+    }
+    .load-more-wrap button {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border-strong);
+      box-shadow: var(--shadow-xs);
+      padding: 10px 28px;
+      min-height: 44px;
+      font-size: 0.875rem;
+    }
+    .load-more-wrap button:hover {
+      background: var(--surface);
+      border-color: #9ca3af;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* ============ БЕЙДЖ РЕДАКТИРОВАНИЯ ============ */
     .editing-badge {
-      display: inline-block; font-size: 0.75rem; font-weight: 500;
-      color: #92400e; background: #fffbeb; border: 1px solid #fde68a;
-      padding: 3px 10px; border-radius: 4px; margin-left: 8px;
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #92400e;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      padding: 3px 10px;
+      border-radius: 6px;
+      margin-left: 8px;
+      animation: pulse 2s ease-in-out infinite;
     }
 
-    /* ============ TOAST УВЕДОМЛЕНИЯ ============ */
+    /* ============ TOAST ============ */
     .toast-container {
       position: fixed;
-      top: 20px;
-      right: 20px;
+      top: 24px;
+      right: 24px;
       z-index: 9999;
       display: flex;
       flex-direction: column;
@@ -265,67 +488,69 @@
     }
     .toast {
       pointer-events: auto;
-      min-width: 280px;
-      max-width: 400px;
+      min-width: 300px;
+      max-width: 420px;
       background: var(--surface);
-      border-left: 4px solid var(--accent);
-      border-radius: var(--radius-sm);
+      border-radius: var(--radius);
       padding: 16px 20px;
       box-shadow: var(--shadow-toast);
       display: flex;
       align-items: flex-start;
       gap: 12px;
-      animation: slideIn 0.3s ease forwards;
+      animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       font-size: 0.875rem;
       font-weight: 500;
       color: var(--text);
+      border-left: 4px solid var(--accent);
+      backdrop-filter: blur(8px);
     }
     .toast.success { border-left-color: var(--income); }
     .toast.error { border-left-color: var(--expense); }
     .toast.info { border-left-color: #3b82f6; }
-    
-    .toast-icon { font-size: 1.25rem; line-height: 1; }
+
+    .toast-icon { font-size: 1.125rem; line-height: 1.4; }
     .toast.success .toast-icon { color: var(--income); }
     .toast.error .toast-icon { color: var(--expense); }
     .toast.info .toast-icon { color: #3b82f6; }
 
-    .toast-message { flex: 1; word-break: break-word; }
+    .toast-message { flex: 1; word-break: break-word; line-height: 1.4; }
 
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-    @keyframes slideOut {
-      from { transform: translateX(0); opacity: 1; }
-      to { transform: translateX(100%); opacity: 0; }
-    }
     .toast.hiding { animation: slideOut 0.3s ease forwards; }
 
-    /* ============ АДАПТИВ (iPhone 17 Pro Max и другие) ============ */
+    /* ============ АДАПТИВ ============ */
     @media (max-width: 720px) {
       body { padding: 16px 12px; }
-      .row { flex-direction: column; align-items: stretch; gap: 12px; }
+      .row { flex-direction: column; align-items: stretch; gap: 14px; }
       .field { min-width: 100%; }
       .report { grid-template-columns: 1fr; gap: 12px; }
       .page-title { font-size: 1.25rem; }
       .report-item .value { font-size: 1.5rem; }
-      .card { padding: 16px; }
-      
-      /* Скрываем колонку "Месяц" на мобильных, чтобы таблица помещалась */
+      .card { padding: 20px; border-radius: var(--radius); }
+      .page-header { margin-bottom: 24px; padding-bottom: 18px; }
+
       th:nth-child(1), td:nth-child(1) { display: none; }
-      /* Скрываем колонку "Назначение" на очень маленьких экранах */
       th:nth-child(6), td:nth-child(6) { display: none; }
-      
-      thead th, tbody td { padding: 10px 8px; font-size: 0.8125rem; }
-      .badge { font-size: 0.625rem; padding: 3px 6px; }
-      
-      .toast-container { top: 10px; right: 10px; left: 10px; }
+
+      thead th, tbody td { padding: 12px 10px; font-size: 0.8125rem; }
+      .badge { font-size: 0.625rem; padding: 4px 8px; }
+
+      .toast-container { top: 12px; right: 12px; left: 12px; }
       .toast { min-width: auto; width: 100%; }
+
+      .report-item { padding: 18px; }
     }
 
     @media (max-width: 380px) {
-      /* Для очень узких экранов (iPhone SE) */
-      th:nth-child(4), td:nth-child(4) { display: none; } /* Скрываем статью */
+      th:nth-child(4), td:nth-child(4) { display: none; }
+    }
+
+    /* ============ REDUCED MOTION ============ */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
     }
   </style>
 </head>
@@ -370,7 +595,6 @@
         </div>
         <div class="field">
           <label>Статья</label>
-          <!-- Добавляем list для автодополнения -->
           <input type="text" id="category" list="category-list" placeholder="Зарплата, аренда…" required>
           <datalist id="category-list"></datalist>
         </div>
@@ -427,11 +651,11 @@
       <button class="success" id="exportBtn">Экспорт в Excel</button>
     </div>
     <div class="report">
-      <div class="report-item">
+      <div class="report-item income-item">
         <div class="label">Приходы</div>
         <div class="value income" id="reportIncome">0,00</div>
       </div>
-      <div class="report-item">
+      <div class="report-item expense-item">
         <div class="label">Расходы</div>
         <div class="value expense" id="reportExpense">0,00</div>
       </div>
@@ -463,13 +687,16 @@
         <tbody id="recordsBody"></tbody>
       </table>
       <div class="empty" id="emptyMsg" style="display:none;">Записей нет</div>
+      <div class="load-more-wrap" id="loadMoreWrap" style="display:none;">
+        <button class="secondary" id="loadMoreBtn">Показать ещё 50</button>
+      </div>
     </div>
   </div>
 
 </div>
 
 <script>
-// ========== FIREBASE (ВСТАВЬТЕ СВОИ КЛЮЧИ!) ==========
+// ========== FIREBASE (ВАШИ КЛЮЧИ) ==========
 const firebaseConfig = {
   apiKey: "AIzaSyDdm0kaIesCu4CBennxPVoPhXwyAyAiwIg",
   authDomain: "chek-listdb.firebaseapp.com",
@@ -481,19 +708,33 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+
+// ========== ОФЛАЙН-РЕЖИМ ==========
+db.enablePersistence({ synchronizeTabs: true })
+  .catch(err => {
+    if (err.code === 'failed-precondition') {
+      console.warn('Офлайн-режим: открыто несколько вкладок, работает только в одной.');
+    } else if (err.code === 'unimplemented') {
+      console.warn('Офлайн-режим: браузер не поддерживает.');
+    }
+  });
+
 const COLLECTION = 'finance_records';
 
 // ========== СОСТОЯНИЕ ==========
 let allRecords = [];
 let unsubscribe = null;
 let editingId = null;
+let limitCount = 50;
+const LIMIT_STEP = 50;
+let lastDocCount = 0;
 
 // ========== TOAST УВЕДОМЛЕНИЯ ==========
 function showToast(message, type = 'info') {
   const container = document.getElementById('toastContainer');
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
-  
+
   let icon = 'ℹ️';
   if (type === 'success') icon = '✅';
   if (type === 'error') icon = '❌';
@@ -502,10 +743,9 @@ function showToast(message, type = 'info') {
     <span class="toast-icon">${icon}</span>
     <span class="toast-message">${message}</span>
   `;
-  
+
   container.appendChild(toast);
 
-  // Автоудаление через 3.5 секунды
   setTimeout(() => {
     toast.classList.add('hiding');
     setTimeout(() => toast.remove(), 300);
@@ -539,12 +779,14 @@ function populateMonthSelect() {
   select.innerHTML = html;
 }
 
-// ========== FIREBASE REALTIME ==========
+// ========== FIREBASE REALTIME С ЛИМИТОМ ==========
 function subscribeToRecords() {
   if (unsubscribe) unsubscribe();
   unsubscribe = db.collection(COLLECTION)
     .orderBy('date', 'desc')
+    .limit(limitCount)
     .onSnapshot(snapshot => {
+      lastDocCount = snapshot.docs.length;
       allRecords = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       populateCategoryFilter();
       populateCategoryDatalist();
@@ -600,10 +842,12 @@ function render() {
   const filtered = getFiltered();
   const tbody = document.getElementById('recordsBody');
   const emptyMsg = document.getElementById('emptyMsg');
+  const loadMoreWrap = document.getElementById('loadMoreWrap');
 
   if (filtered.length === 0) {
     tbody.innerHTML = '';
     emptyMsg.style.display = 'block';
+    loadMoreWrap.style.display = 'none';
   } else {
     emptyMsg.style.display = 'none';
     tbody.innerHTML = filtered.map(r => {
@@ -626,6 +870,12 @@ function render() {
         </tr>
       `;
     }).join('');
+
+    if (lastDocCount >= limitCount) {
+      loadMoreWrap.style.display = 'flex';
+    } else {
+      loadMoreWrap.style.display = 'none';
+    }
   }
 
   const income = filtered.filter(r => r.type === 'income').reduce((s, r) => s + Number(r.amount), 0);
@@ -634,6 +884,13 @@ function render() {
   document.getElementById('reportExpense').textContent = fmt(expense);
   document.getElementById('reportBalance').textContent = fmt(income - expense);
 }
+
+// ========== КНОПКА "ПОКАЗАТЬ ЕЩЁ" ==========
+document.getElementById('loadMoreBtn').addEventListener('click', () => {
+  limitCount += LIMIT_STEP;
+  showToast(`Загружаем ещё ${LIMIT_STEP} записей…`, 'info');
+  subscribeToRecords();
+});
 
 // ========== ДОБАВЛЕНИЕ / РЕДАКТИРОВАНИЕ ==========
 document.getElementById('addForm').addEventListener('submit', async (e) => {
