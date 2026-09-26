@@ -215,6 +215,7 @@
       appearance: none;
       text-align: left;
       padding-right: 40px;
+      position: relative; /* <--- ИСПРАВЛЕНИЕ: ограничивает кликабельную область */
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3e%3c/rect%3e%3cline x1='16' y1='2' x2='16' y2='6'%3e%3c/line%3e%3cline x1='8' y1='2' x2='8' y2='6'%3e%3c/line%3e%3cline x1='3' y1='10' x2='21' y2='10'%3e%3c/line%3e%3c/svg%3e");
       background-repeat: no-repeat;
       background-position: right 14px center;
@@ -226,9 +227,11 @@
       opacity: 0;
       position: absolute;
       right: 0;
+      top: 0;
       width: 100%;
       height: 100%;
       cursor: pointer;
+      z-index: 2;
     }
 
     /* ============ КНОПКИ ============ */
@@ -570,7 +573,6 @@
       .card { padding: 20px; border-radius: var(--radius); }
       .page-header { margin-bottom: 24px; padding-bottom: 18px; }
 
-      /* Скрываем колонки: Месяц (1), Назначение (6), Заметка (8) */
       th:nth-child(1), td:nth-child(1) { display: none; }
       th:nth-child(6), td:nth-child(6) { display: none; }
       th:nth-child(8), td:nth-child(8) { display: none; }
@@ -585,11 +587,9 @@
     }
 
     @media (max-width: 380px) {
-      /* Скрываем Статью (4) на очень узких экранах */
       th:nth-child(4), td:nth-child(4) { display: none; }
     }
 
-    /* ============ REDUCED MOTION ============ */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         animation-duration: 0.01ms !important;
@@ -727,7 +727,7 @@
             <th class="num">Сумма, ₽</th>
             <th>Назначение</th>
             <th style="width:80px;"></th>
-            <th>Заметка</th> <!-- Новая колонка -->
+            <th>Заметка</th>
           </tr>
         </thead>
         <tbody id="recordsBody"></tbody>
@@ -942,7 +942,6 @@ function render() {
 window.updateNote = async (id, text) => {
   try {
     await db.collection(COLLECTION).doc(id).update({ note: text.trim() });
-    // Тихо сохраняем, без Toast, чтобы не отвлекать
   } catch (err) {
     console.error('Ошибка сохранения заметки:', err);
     showToast('Не удалось сохранить заметку: ' + err.message, 'error');
