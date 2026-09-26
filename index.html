@@ -24,11 +24,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <!-- Compat: только App + Firestore -->
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-
-  <!-- QR-код для TOTP -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -98,20 +93,17 @@
       padding-right: calc(24px + env(safe-area-inset-right));
       padding-bottom: calc(40px + env(safe-area-inset-bottom));
       padding-left: calc(24px + env(safe-area-inset-left));
-      transition: background var(--transition);
     }
     body::before {
       content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='340'%20height='340'%20viewBox='0%200%20340%20340'%3E%3Cg%20fill='%230f172a'%20font-family='Georgia,serif'%20font-weight='700'%3E%3Ctext%20x='25'%20y='70'%20font-size='54'%20transform='rotate(-15%2025%2070)'%3E%24%3C/text%3E%3Ctext%20x='220'%20y='55'%20font-size='42'%20transform='rotate(18%20220%2055)'%3E%E2%82%AC%3C/text%3E%3Ctext%20x='100'%20y='185'%20font-size='50'%20transform='rotate(-6%20100%20185)'%3E%E2%82%BD%3C/text%3E%3Ctext%20x='255'%20y='210'%20font-size='46'%20transform='rotate(12%20255%20210)'%3E%C2%A3%3C/text%3E%3Ctext%20x='45'%20y='305'%20font-size='44'%20transform='rotate(22%2045%20305)'%3E%C2%A5%3C/text%3E%3Ctext%20x='225'%20y='320'%20font-size='40'%20transform='rotate(-18%20225%20320)'%3E%E2%82%A3%3C/text%3E%3C/g%3E%3C/svg%3E");
       background-repeat: repeat; background-size: 340px 340px;
       opacity: var(--bg-opacity);
-      transition: opacity var(--transition), filter var(--transition);
     }
     [data-theme="dark"] body::before { filter: invert(1); }
     body::after {
       content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background: linear-gradient(180deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 30%, rgba(255,255,255,0) 70%, rgba(255,255,255,0.25) 100%);
-      transition: opacity var(--transition);
     }
     [data-theme="dark"] body::after { opacity: 0; }
     .container { max-width: 1280px; margin: 0 auto; position: relative; z-index: 1; }
@@ -165,7 +157,7 @@
       background: var(--expense-soft); color: var(--expense-text);
       border: 1px solid var(--expense-border); padding: 12px 16px;
       border-radius: 8px; font-size: 0.8125rem; font-weight: 500;
-      margin-bottom: 16px; display: none; animation: fadeIn var(--transition);
+      margin-bottom: 16px; display: none;
     }
     .login-error.visible { display: block; }
     #qrcode { display: inline-block; padding: 12px; background: #fff; border-radius: 12px; box-shadow: var(--shadow-sm); }
@@ -198,7 +190,6 @@
       width: 48px; height: 48px; border-radius: 50%; object-fit: cover;
       border: 3px solid var(--surface-solid); box-shadow: var(--shadow-sm);
       background-color: var(--surface-alt);
-      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
       cursor: pointer; flex-shrink: 0;
     }
     .user-avatar:hover { transform: scale(1.08); box-shadow: var(--shadow-md); }
@@ -213,8 +204,8 @@
       font-size: 0.6875rem; font-weight: 500; color: var(--text-muted);
       text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; white-space: nowrap;
     }
+
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slideIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(110%); opacity: 0; } }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
@@ -262,9 +253,8 @@
       font-family: var(--font); font-size: 1rem; padding: 12px 14px;
       color: var(--text); background: var(--surface-solid);
       border: 1px solid var(--border-strong); border-radius: 8px;
-      outline: none;
-      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition);
-      width: 100%; min-height: 48px;
+      outline: none; width: 100%; min-height: 48px;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
     }
     input:hover, select:hover { border-color: var(--text-subtle); }
     input:focus, select:focus { border-color: var(--text); box-shadow: 0 0 0 4px rgba(148,163,184,0.15); }
@@ -294,11 +284,12 @@
     button {
       font-family: var(--font); font-size: 0.875rem; font-weight: 600;
       padding: 12px 22px; border: 1px solid transparent; border-radius: 8px;
-      cursor: pointer; transition: all var(--transition-fast); white-space: nowrap;
+      cursor: pointer; white-space: nowrap;
       background: linear-gradient(180deg, var(--btn-bg-1) 0%, var(--btn-bg-2) 100%);
       color: #fff; min-height: 48px;
       display: inline-flex; align-items: center; justify-content: center;
       box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
+      transition: all var(--transition-fast);
     }
     button::after {
       content: ''; position: absolute; inset: 0;
@@ -452,13 +443,6 @@
       .toast { min-width: auto; width: 100%; }
     }
     @media (max-width: 380px) { th:nth-child(4), td:nth-child(4) { display: none; } }
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
   </style>
 </head>
 <body>
@@ -651,35 +635,38 @@
   </div>
 </div>
 
-<!-- Загрузка модульного Auth (без compat) -->
 <script type="module">
-  import {
-    getAuth,
-    onAuthStateChanged,
-    signInWithEmailAndPassword,
-    signOut,
-    multiFactor,
-    getMultiFactorResolver,
-    TotpMultiFactorGenerator
-  } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
-
-  window.ModAuth = {
-    getAuth,
-    onAuthStateChanged,
-    signInWithEmailAndPassword,
-    signOut,
-    multiFactor,
-    getMultiFactorResolver,
-    TotpMultiFactorGenerator,
-    ready: true
-  };
-  window.dispatchEvent(new Event('ModAuthReady'));
-  console.log('[ModAuth] Модульный Auth загружен');
-</script>
-
-<script>
 // ============================================
-// FIREBASE COMPAT (только Firestore)
+// МОДУЛЬНЫЕ ИМПОРТЫ FIREBASE v10
+// ============================================
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+import {
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+  collection,
+  doc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  orderBy,
+  limit,
+  onSnapshot,
+  serverTimestamp
+} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+  multiFactor,
+  getMultiFactorResolver,
+  TotpMultiFactorGenerator
+} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+
+// ============================================
+// FIREBASE CONFIG
 // ============================================
 const firebaseConfig = {
   apiKey: "AIzaSyDdm0kaIesCu4CBennxPVoPhXwyAyAiwIg",
@@ -690,16 +677,18 @@ const firebaseConfig = {
   appId: "1:966580226421:web:af59fd2a1ad92fd4b8eb3c"
 };
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-db.enablePersistence({ synchronizeTabs: true }).catch(err => {
-  if (err.code === 'failed-precondition') console.warn('Офлайн: несколько вкладок.');
-  else if (err.code === 'unimplemented') console.warn('Офлайн: не поддерживается.');
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
 });
 
 const COLLECTION = 'finance_records';
+console.log('[INIT] Firebase инициализирован (модульный SDK)');
 
+// ============================================
+// СОСТОЯНИЕ
+// ============================================
 let allRecords = [];
 let unsubscribe = null;
 let editingId = null;
@@ -711,17 +700,6 @@ let searchQuery = '';
 let searchTimeout = null;
 let mfaResolver = null;
 let totpSecret = null;
-let authMod = null; // модульный auth instance
-
-// ============================================
-// ОЖИДАНИЕ ЗАГРУЗКИ МОДУЛЯ AUTH
-// ============================================
-function waitForModAuth() {
-  return new Promise((resolve) => {
-    if (window.ModAuth && window.ModAuth.ready) return resolve(window.ModAuth);
-    window.addEventListener('ModAuthReady', () => resolve(window.ModAuth), { once: true });
-  });
-}
 
 // ============================================
 // TOAST
@@ -795,11 +773,12 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   btn.textContent = 'Проверка…';
 
   try {
-    await window.ModAuth.signInWithEmailAndPassword(authMod, email, password);
-    showToast('Добро пожаловать!', 'success');
+    await signInWithEmailAndPassword(auth, email, password);
+    // Если MFA нужна — сработает catch с multi-factor-auth-required
+    // Если нет — onAuthStateChanged подхватит вход
   } catch (err) {
     if (err.code === 'auth/multi-factor-auth-required') {
-      mfaResolver = window.ModAuth.getMultiFactorResolver(authMod, err);
+      mfaResolver = getMultiFactorResolver(auth, err);
       showScreen('mfa');
       document.getElementById('mfaCode').value = '';
       document.getElementById('mfaError').classList.remove('visible');
@@ -825,7 +804,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 });
 
 // ============================================
-// MFA
+// MFA — ввод кода
 // ============================================
 document.getElementById('mfaForm').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -847,7 +826,7 @@ document.getElementById('mfaForm').addEventListener('submit', async (e) => {
     const hint = mfaResolver.hints.find(h => h.factorId === 'totp');
     if (!hint) throw new Error('TOTP-фактор не найден');
 
-    const assertion = window.ModAuth.TotpMultiFactorGenerator.assertionForSignIn(hint.uid, code);
+    const assertion = TotpMultiFactorGenerator.assertionForSignIn(hint.uid, code);
     await mfaResolver.resolveSignIn(assertion);
     showToast('Вход выполнен!', 'success');
   } catch (err) {
@@ -864,7 +843,7 @@ document.getElementById('mfaForm').addEventListener('submit', async (e) => {
 
 document.getElementById('mfaCancelBtn').addEventListener('click', async () => {
   mfaResolver = null;
-  try { await window.ModAuth.signOut(authMod); } catch (e) {}
+  try { await signOut(auth); } catch (e) {}
   showLogin();
 });
 
@@ -876,11 +855,11 @@ async function startEnrollment(user) {
     console.log('[2FA] Начинаем регистрацию TOTP...');
     console.log('[2FA] User email:', user?.email);
 
-    const mfUser = window.ModAuth.multiFactor(user);
+    const mfUser = multiFactor(user);
     const multiFactorSession = await mfUser.getSession();
     console.log('[2FA] Сессия MFA получена');
 
-    totpSecret = await window.ModAuth.TotpMultiFactorGenerator.generateSecret(multiFactorSession);
+    totpSecret = await TotpMultiFactorGenerator.generateSecret(multiFactorSession);
     console.log('[2FA] Секрет сгенерирован');
 
     const qrContainer = document.getElementById('qrcode');
@@ -900,7 +879,7 @@ async function startEnrollment(user) {
     errBox.innerHTML = 'Ошибка 2FA: <strong>' + err.message + '</strong>';
     errBox.classList.add('visible');
     showScreen('login');
-    try { await window.ModAuth.signOut(authMod); } catch (e) {}
+    try { await signOut(auth); } catch (e) {}
   }
 }
 
@@ -921,8 +900,8 @@ document.getElementById('enrollForm').addEventListener('submit', async (e) => {
   btn.textContent = 'Сохранение…';
 
   try {
-    const mfUser = window.ModAuth.multiFactor(authMod.currentUser);
-    const assertion = window.ModAuth.TotpMultiFactorGenerator.assertionForEnrollment(totpSecret, code);
+    const mfUser = multiFactor(auth.currentUser);
+    const assertion = TotpMultiFactorGenerator.assertionForEnrollment(totpSecret, code);
     await mfUser.enroll(assertion, 'Google Authenticator');
     showToast('2FA успешно настроена!', 'success');
     showApp();
@@ -944,7 +923,7 @@ document.getElementById('enrollForm').addEventListener('submit', async (e) => {
 document.getElementById('logoutBtn').addEventListener('click', async () => {
   if (!confirm('Выйти из системы?')) return;
   try {
-    await window.ModAuth.signOut(authMod);
+    await signOut(auth);
     showToast('Вы вышли из системы', 'info');
   } catch (err) {
     showToast('Ошибка выхода: ' + err.message, 'error');
@@ -976,24 +955,26 @@ function populateMonthSelect() {
 }
 
 // ============================================
-// FIREBASE REALTIME
+// FIREBASE REALTIME (модульный)
 // ============================================
 function subscribeToRecords() {
   if (!currentUser) return;
   if (unsubscribe) unsubscribe();
-  unsubscribe = db.collection(COLLECTION)
-    .orderBy('date', 'desc')
-    .limit(limitCount)
-    .onSnapshot(snapshot => {
-      lastDocCount = snapshot.docs.length;
-      allRecords = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      populateCategoryFilter();
-      populateCategoryDatalist();
-      render();
-    }, err => {
-      console.error('Ошибка загрузки:', err);
-      showToast('Не удалось загрузить данные.', 'error');
-    });
+  const q = query(
+    collection(db, COLLECTION),
+    orderBy('date', 'desc'),
+    limit(limitCount)
+  );
+  unsubscribe = onSnapshot(q, snapshot => {
+    lastDocCount = snapshot.docs.length;
+    allRecords = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    populateCategoryFilter();
+    populateCategoryDatalist();
+    render();
+  }, err => {
+    console.error('Ошибка загрузки:', err);
+    showToast('Не удалось загрузить данные.', 'error');
+  });
 }
 
 function populateCategoryDatalist() {
@@ -1066,7 +1047,6 @@ function getFiltered() {
     if (category !== 'all' && r.category !== category) return false;
     if (dateFrom && r.date < dateFrom) return false;
     if (dateTo && r.date > dateTo) return false;
-
     if (searchQuery) {
       const haystack = [
         r.month, r.date, r.category, r.description, r.note,
@@ -1157,47 +1137,14 @@ function render() {
   document.getElementById('reportBalance').textContent = fmt(income - expense);
 }
 
+// ============================================
+// ГЛОБАЛЬНЫЕ ФУНКЦИИ ДЛЯ HTML (onclick/onblur)
+// ============================================
 window.updateNote = async (id, text) => {
   if (!currentUser) return;
-  try { await db.collection(COLLECTION).doc(id).update({ note: text.trim() }); }
+  try { await updateDoc(doc(db, COLLECTION, id), { note: text.trim() }); }
   catch (err) { console.error('Ошибка заметки:', err); showToast('Не удалось сохранить заметку', 'error'); }
 };
-
-document.getElementById('loadMoreBtn').addEventListener('click', () => {
-  limitCount += LIMIT_STEP;
-  showToast(`Загружаем ещё ${LIMIT_STEP} записей…`, 'info');
-  subscribeToRecords();
-});
-
-// ============================================
-// ДОБАВЛЕНИЕ / РЕДАКТИРОВАНИЕ
-// ============================================
-document.getElementById('addForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  if (!currentUser) return;
-  const data = {
-    month: document.getElementById('month').value,
-    date: document.getElementById('date').value,
-    type: document.getElementById('type').value,
-    category: document.getElementById('category').value.trim(),
-    amount: parseFloat(document.getElementById('amount').value),
-    description: document.getElementById('description').value.trim()
-  };
-  try {
-    if (editingId) {
-      data.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
-      await db.collection(COLLECTION).doc(editingId).update(data);
-      showToast('Запись обновлена', 'success');
-      cancelEdit();
-    } else {
-      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-      await db.collection(COLLECTION).add(data);
-      showToast('Запись добавлена', 'success');
-      e.target.reset();
-      document.getElementById('date').valueAsDate = new Date();
-    }
-  } catch (err) { console.error('Ошибка сохранения:', err); showToast('Не удалось сохранить: ' + err.message, 'error'); }
-});
 
 window.startEdit = (id) => {
   const r = allRecords.find(x => x.id === id);
@@ -1221,6 +1168,55 @@ window.startEdit = (id) => {
   document.getElementById('addForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 
+window.deleteRecord = async (id) => {
+  if (!currentUser) return;
+  if (!confirm('Удалить запись?')) return;
+  try {
+    await deleteDoc(doc(db, COLLECTION, id));
+    showToast('Запись удалена', 'info');
+    if (editingId === id) cancelEdit();
+  } catch (err) { console.error('Ошибка удаления:', err); showToast('Не удалось удалить: ' + err.message, 'error'); }
+};
+
+// ============================================
+// КНОПКА "ПОКАЗАТЬ ЕЩЁ"
+// ============================================
+document.getElementById('loadMoreBtn').addEventListener('click', () => {
+  limitCount += LIMIT_STEP;
+  showToast(`Загружаем ещё ${LIMIT_STEP} записей…`, 'info');
+  subscribeToRecords();
+});
+
+// ============================================
+// ДОБАВЛЕНИЕ / РЕДАКТИРОВАНИЕ
+// ============================================
+document.getElementById('addForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!currentUser) return;
+  const data = {
+    month: document.getElementById('month').value,
+    date: document.getElementById('date').value,
+    type: document.getElementById('type').value,
+    category: document.getElementById('category').value.trim(),
+    amount: parseFloat(document.getElementById('amount').value),
+    description: document.getElementById('description').value.trim()
+  };
+  try {
+    if (editingId) {
+      data.updatedAt = serverTimestamp();
+      await updateDoc(doc(db, COLLECTION, editingId), data);
+      showToast('Запись обновлена', 'success');
+      cancelEdit();
+    } else {
+      data.createdAt = serverTimestamp();
+      await addDoc(collection(db, COLLECTION), data);
+      showToast('Запись добавлена', 'success');
+      e.target.reset();
+      document.getElementById('date').valueAsDate = new Date();
+    }
+  } catch (err) { console.error('Ошибка сохранения:', err); showToast('Не удалось сохранить: ' + err.message, 'error'); }
+});
+
 function cancelEdit() {
   editingId = null;
   document.getElementById('addForm').reset();
@@ -1231,16 +1227,6 @@ function cancelEdit() {
   document.getElementById('cancelEditBtn').style.display = 'none';
 }
 document.getElementById('cancelEditBtn').addEventListener('click', cancelEdit);
-
-window.deleteRecord = async (id) => {
-  if (!currentUser) return;
-  if (!confirm('Удалить запись?')) return;
-  try {
-    await db.collection(COLLECTION).doc(id).delete();
-    showToast('Запись удалена', 'info');
-    if (editingId === id) cancelEdit();
-  } catch (err) { console.error('Ошибка удаления:', err); showToast('Не удалось удалить: ' + err.message, 'error'); }
-};
 
 // ============================================
 // ЭКСПОРТ В EXCEL
@@ -1302,28 +1288,22 @@ document.getElementById('resetFilters').addEventListener('click', () => {
 });
 
 // ============================================
-// СТАРТ
+// ОТСЛЕЖИВАНИЕ АУТЕНТИФИКАЦИИ
 // ============================================
-(async () => {
-  await waitForModAuth();
-  authMod = window.ModAuth.getAuth(firebase.app());
-  console.log('[AUTH] Модульный auth инициализирован');
-
-  window.ModAuth.onAuthStateChanged(authMod, async (user) => {
-    currentUser = user;
-    if (user) {
-      const factors = user.multiFactor?.enrolledFactors || [];
-      console.log('[AUTH] User вошёл. TOTP-факторов:', factors.length);
-      if (factors.length === 0) {
-        await startEnrollment(user);
-      } else {
-        showApp();
-      }
+onAuthStateChanged(auth, async (user) => {
+  currentUser = user;
+  if (user) {
+    const factors = user.multiFactor?.enrolledFactors || [];
+    console.log('[AUTH] Вошёл:', user.email, '| TOTP-факторов:', factors.length);
+    if (factors.length === 0) {
+      await startEnrollment(user);
     } else {
-      showLogin();
+      showApp();
     }
-  });
-})();
+  } else {
+    showLogin();
+  }
+});
 </script>
 </body>
 </html>
