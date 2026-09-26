@@ -20,7 +20,6 @@
   <style>
     :root {
       --bg:            #f4f5f7;
-      --bg-gradient:   linear-gradient(180deg, #f8f9fb 0%, #f4f5f7 100%);
       --surface:       #ffffff;
       --surface-alt:   #fafbfc;
       --surface-hover: #f8fafc;
@@ -62,19 +61,53 @@
 
     html, body {
       font-family: var(--font);
-      background: var(--bg-gradient);
-      background-attachment: fixed;
       color: var(--text);
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       font-feature-settings: 'cv02','cv03','cv04','cv11','tnum';
       line-height: 1.5;
       min-height: 100vh;
-      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     }
 
-    body { padding: 40px 24px; }
-    .container { max-width: 1280px; margin: 0 auto; }
+    body {
+      /* Основной градиент + мягкие цветные пятна по углам */
+      background:
+        radial-gradient(ellipse at top left,    rgba(5, 150, 105, 0.06) 0%, transparent 55%),
+        radial-gradient(ellipse at bottom right, rgba(220, 38, 38, 0.05) 0%, transparent 55%),
+        radial-gradient(ellipse at top right,   rgba(59, 130, 246, 0.04) 0%, transparent 50%),
+        linear-gradient(180deg, #f8f9fb 0%, #eef0f3 100%);
+      background-attachment: fixed;
+      padding: 40px 24px;
+      padding-top: calc(40px + env(safe-area-inset-top));
+      padding-right: calc(24px + env(safe-area-inset-right));
+      padding-bottom: calc(40px + env(safe-area-inset-bottom));
+      padding-left: calc(24px + env(safe-area-inset-left));
+    }
+
+    /* ============ ВАЛЮТНЫЙ ФОН ============ */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='340'%20height='340'%20viewBox='0%200%20340%20340'%3E%3Cg%20fill='%230f172a'%20font-family='Georgia,serif'%20font-weight='700'%3E%3Ctext%20x='25'%20y='70'%20font-size='54'%20transform='rotate(-15%2025%2070)'%3E%24%3C/text%3E%3Ctext%20x='220'%20y='55'%20font-size='42'%20transform='rotate(18%20220%2055)'%3E%E2%82%AC%3C/text%3E%3Ctext%20x='100'%20y='185'%20font-size='50'%20transform='rotate(-6%20100%20185)'%3E%E2%82%BD%3C/text%3E%3Ctext%20x='255'%20y='210'%20font-size='46'%20transform='rotate(12%20255%20210)'%3E%C2%A3%3C/text%3E%3Ctext%20x='45'%20y='305'%20font-size='44'%20transform='rotate(22%2045%20305)'%3E%C2%A5%3C/text%3E%3Ctext%20x='225'%20y='320'%20font-size='40'%20transform='rotate(-18%20225%20320)'%3E%E2%82%A3%3C/text%3E%3C/g%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 340px 340px;
+      opacity: 0.055;
+    }
+
+    /* Лёгкое затемнение сверху вниз для контраста карточек */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 30%, rgba(255,255,255,0) 70%, rgba(255,255,255,0.25) 100%);
+    }
+
+    .container { max-width: 1280px; margin: 0 auto; position: relative; z-index: 1; }
 
     /* ============ ЭКРАН ЛОГИНА ============ */
     #loginScreen {
@@ -82,17 +115,30 @@
       align-items: center;
       justify-content: center;
       min-height: 80vh;
+      position: relative;
+      z-index: 1;
       animation: fadeInUp var(--transition-slow) both;
     }
     #loginScreen.visible { display: flex; }
     .login-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.8);
       border-radius: var(--radius-lg);
       padding: 40px;
       width: 100%;
       max-width: 420px;
       box-shadow: var(--shadow-xl);
+      position: relative;
+      overflow: hidden;
+    }
+    .login-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #059669 0%, #0f172a 50%, #dc2626 100%);
     }
     .login-logo { text-align: center; margin-bottom: 28px; }
     .login-logo-icon {
@@ -106,6 +152,7 @@
       font-size: 1.75rem;
       margin-bottom: 16px;
       box-shadow: var(--shadow-md);
+      color: #fff;
     }
     .login-title {
       font-size: 1.375rem;
@@ -137,7 +184,7 @@
     .login-error.visible { display: block; }
 
     /* ============ ПРИЛОЖЕНИЕ ============ */
-    #app { display: none; }
+    #app { display: none; position: relative; z-index: 1; }
     #app.visible { display: block; }
 
     /* ============ ШАПКА ============ */
@@ -148,8 +195,13 @@
       flex-wrap: wrap;
       gap: 12px;
       margin-bottom: 32px;
-      padding-bottom: 24px;
-      border-bottom: 1px solid var(--border);
+      padding: 20px 24px;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
     }
     .page-title {
       font-size: 1.5rem;
@@ -192,8 +244,10 @@
 
     /* ============ КАРТОЧКИ ============ */
     .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.8);
       border-radius: var(--radius-lg);
       padding: 28px;
       margin-bottom: 20px;
@@ -203,7 +257,7 @@
     }
     .card:hover {
       box-shadow: var(--shadow-md);
-      border-color: #dde1e6;
+      border-color: rgba(209, 213, 219, 0.6);
     }
     .card-header {
       display: flex;
@@ -290,8 +344,9 @@
       display: block;
       font-size: 0.6875rem;
       color: var(--text-subtle);
-      margin-top: 6px;
+      margin-top: 12px;
       font-weight: 500;
+      text-align: right;
     }
     .kbd {
       display: inline-block;
@@ -671,7 +726,9 @@
       pointer-events: auto;
       min-width: 300px;
       max-width: 420px;
-      background: var(--surface);
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border-radius: var(--radius);
       padding: 16px 20px;
       box-shadow: var(--shadow-toast);
@@ -693,14 +750,15 @@
 
     /* ============ АДАПТИВ ============ */
     @media (max-width: 720px) {
-      body { padding: 16px 12px; }
+      body { padding: 16px 12px; padding-top: calc(16px + env(safe-area-inset-top)); padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
+      body::before { background-size: 260px 260px; opacity: 0.05; }
       .row { flex-direction: column; align-items: stretch; gap: 14px; }
       .field { min-width: 100%; }
       .report { grid-template-columns: 1fr; gap: 12px; }
       .page-title { font-size: 1.25rem; }
       .report-item .value { font-size: 1.5rem; }
       .card { padding: 20px; border-radius: var(--radius); }
-      .page-header { margin-bottom: 24px; padding-bottom: 18px; }
+      .page-header { margin-bottom: 24px; padding: 16px; border-radius: var(--radius); }
       .login-card { padding: 28px 24px; }
 
       .card-header { gap: 14px; }
@@ -738,7 +796,7 @@
 <div id="loginScreen">
   <div class="login-card">
     <div class="login-logo">
-      <div class="login-logo-icon">🔒</div>
+      <div class="login-logo-icon">💱</div>
       <div class="login-title">Вход в систему</div>
       <div class="login-subtitle">Введите пароль для доступа к данным</div>
     </div>
@@ -1077,7 +1135,6 @@ searchClear.addEventListener('click', () => {
   render();
 });
 
-// Ctrl+K / Cmd+K — фокус на поиск
 document.addEventListener('keydown', (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
     e.preventDefault();
@@ -1096,7 +1153,7 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// ========== ФИЛЬТРАЦИЯ (с учётом поиска) ==========
+// ========== ФИЛЬТРАЦИЯ ==========
 function getFiltered() {
   const type = document.getElementById('filterType').value;
   const category = document.getElementById('filterCategory').value;
@@ -1126,7 +1183,7 @@ function esc(s) {
   return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
-// ========== ПОДСВЕТКА СОВПАДЕНИЙ ==========
+// ========== ПОДСВЕТКА ==========
 function highlight(text, query) {
   const str = String(text == null ? '' : text);
   if (!query) return esc(str);
@@ -1337,7 +1394,7 @@ document.getElementById('resetFilters').addEventListener('click', () => {
   render();
 });
 
-// ========== СТАРТ ==========
+// ========== СТАРТ ============
 if (isSessionValid()) { showApp(); } else { showLogin(); }
 </script>
 </body>
