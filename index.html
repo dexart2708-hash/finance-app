@@ -701,6 +701,7 @@ let searchTimeout = null;
 let mfaResolver = null;
 let totpSecret = null;
 let appInitialized = false;
+let mfaJustCompleted = false; // ✅ флаг, что MFA только что пройден
 
 // ============================================
 // TOAST
@@ -755,7 +756,6 @@ function showLogin() {
 
 function showApp() {
   showScreen('app');
-  // populateMonthSelect и date устанавливаем только один раз при входе
   if (!appInitialized) {
     populateMonthSelect();
     document.getElementById('date').valueAsDate = new Date();
@@ -809,7 +809,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 });
 
 // ============================================
-// MFA — ввод кода (с ПРАВКОЙ 1)
+// MFA — ввод кода
 // ============================================
 document.getElementById('mfaForm').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -833,12 +833,12 @@ document.getElementById('mfaForm').addEventListener('submit', async (e) => {
 
     const assertion = TotpMultiFactorGenerator.assertionForSignIn(hint.uid, code);
     await mfaResolver.resolveSignIn(assertion);
-    // ✅ ПРАВКА 1: принудительно обновляем user, чтобы enrolledFactors появились
+    // ✅ Помечаем, что MFA только что пройден — onAuthStateChanged пойдёт сразу в приложение
+    mfaJustCompleted = true;
     if (auth.currentUser) {
       try { await auth.currentUser.reload(); } catch (e) { console.warn('[reload]', e); }
     }
     showToast('Вход выполнен!', 'success');
-    // onAuthStateChanged сам переключит на приложение
   } catch (err) {
     console.error('MFA error:', err);
     errBox.textContent = 'Неверный код. Попробуйте ещё раз.';
@@ -858,11 +858,10 @@ document.getElementById('mfaCancelBtn').addEventListener('click', async () => {
 });
 
 // ============================================
-// РЕГИСТРАЦИЯ TOTP (с ПРАВКОЙ 3)
+// РЕГИСТРАЦИЯ TOTP
 // ============================================
 async function startEnrollment(user) {
   try {
-    // ✅ ПРАВКА 3: защита от повторной регистрации
     const existing = user.multiFactor?.enrolledFactors || [];
     if (existing.length > 0) {
       console.log('[2FA] У пользователя уже есть TOTP-фактор, пропускаем регистрацию');
@@ -921,8 +920,9 @@ document.getElementById('enrollForm').addEventListener('submit', async (e) => {
     const mfUser = multiFactor(auth.currentUser);
     const assertion = TotpMultiFactorGenerator.assertionForEnrollment(totpSecret, code);
     await mfUser.enroll(assertion, 'Google Authenticator');
-    // Обновляем user, чтобы enrolledFactors появились
     try { await auth.currentUser.reload(); } catch (e) {}
+    // ✅ Помечаем, чтобы onAuthStateChanged сразу показал приложение
+    mfaJustCompleted = true;
     showToast('2FA успешно настроена!', 'success');
     showApp();
   } catch (err) {
@@ -1158,7 +1158,7 @@ function render() {
 }
 
 // ============================================
-// ГЛОБАЛЬНЫЕ ФУНКЦИИ ДЛЯ HTML
+// ГЛОБАЛЬНЫЕ ФУНКЦИИ
 // ============================================
 window.updateNote = async (id, text) => {
   if (!currentUser) return;
@@ -1308,12 +1308,20 @@ document.getElementById('resetFilters').addEventListener('click', () => {
 });
 
 // ============================================
-// ОТСЛЕЖИВАНИЕ АУТЕНТИФИКАЦИИ (с ПРАВКОЙ 2)
+// ОТСЛЕЖИВАНИЕ АУТЕНТИФИКАЦИИ
 // ============================================
 onAuthStateChanged(auth, async (user) => {
   currentUser = user;
   if (user) {
-    // ✅ ПРАВКА 2: всегда перезагружаем user, чтобы enrolledFactors были актуальны
+    // Если только что прошли MFA или enrollment — сразу показываем приложение
+    if (mfaJustCompleted) {
+      mfaJustCompleted = false;
+      console.log('[AUTH] MFA только что пройден → сразу в приложение');
+      showApp();
+      return;
+    }
+
+    // Перезагружаем user, чтобы получить актуальные enrolledFactors
     try { await user.reload(); } catch (e) { console.warn('[reload]', e); }
     const freshUser = auth.currentUser;
     currentUser = freshUser;
