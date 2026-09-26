@@ -166,11 +166,7 @@
       margin-top: 4px;
       font-weight: 400;
     }
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    .user-info { display: flex; align-items: center; gap: 12px; }
 
     /* ============ АНИМАЦИИ ============ */
     @keyframes fadeInUp {
@@ -232,6 +228,93 @@
       height: 16px;
       background: linear-gradient(180deg, #0f172a 0%, #475569 100%);
       border-radius: 2px;
+    }
+
+    /* ============ ПОИСК ============ */
+    .search-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      max-width: 340px;
+      width: 100%;
+    }
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      width: 16px;
+      height: 16px;
+      color: var(--text-subtle);
+      pointer-events: none;
+      transition: color var(--transition-fast);
+      z-index: 1;
+    }
+    .search-wrap:focus-within .search-icon { color: var(--accent); }
+    .search-input {
+      padding-left: 40px;
+      padding-right: 44px;
+      min-height: 44px;
+      font-size: 0.875rem;
+      background: var(--surface-alt);
+    }
+    .search-input:focus { background: var(--surface); }
+    .search-clear {
+      position: absolute;
+      right: 8px;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      min-height: auto;
+      background: transparent;
+      color: var(--text-muted);
+      border: none;
+      border-radius: 50%;
+      font-size: 1.25rem;
+      line-height: 1;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: none;
+      font-weight: 400;
+    }
+    .search-clear::after { display: none; }
+    .search-clear:hover {
+      background: var(--accent-soft);
+      color: var(--text);
+      transform: none;
+      box-shadow: none;
+    }
+    .search-clear.visible { display: flex; }
+
+    .search-hint {
+      display: block;
+      font-size: 0.6875rem;
+      color: var(--text-subtle);
+      margin-top: 6px;
+      font-weight: 500;
+    }
+    .kbd {
+      display: inline-block;
+      padding: 1px 5px;
+      font-family: var(--font);
+      font-size: 0.625rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-bottom-width: 2px;
+      border-radius: 4px;
+      margin: 0 2px;
+    }
+
+    /* ============ ПОДСВЕТКА СОВПАДЕНИЙ ============ */
+    mark {
+      background: #fef08a;
+      color: inherit;
+      padding: 1px 3px;
+      border-radius: 3px;
+      font-weight: 600;
+      box-shadow: inset 0 -1px 0 rgba(202, 138, 4, 0.2);
     }
 
     /* ============ ПОЛЯ ============ */
@@ -501,6 +584,18 @@
       margin-bottom: 12px;
       opacity: 0.5;
     }
+    .empty.searching::before { content: '🔍'; }
+    .empty .empty-query {
+      display: inline-block;
+      font-weight: 600;
+      color: var(--text);
+      background: var(--surface-alt);
+      padding: 1px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      font-style: normal;
+      margin-top: 4px;
+    }
 
     /* ============ ДЕЙСТВИЯ ============ */
     .actions { display: flex; gap: 6px; justify-content: flex-end; }
@@ -607,6 +702,9 @@
       .card { padding: 20px; border-radius: var(--radius); }
       .page-header { margin-bottom: 24px; padding-bottom: 18px; }
       .login-card { padding: 28px 24px; }
+
+      .card-header { gap: 14px; }
+      .search-wrap { max-width: 100%; }
 
       th:nth-child(1), td:nth-child(1) { display: none; }
       th:nth-child(6), td:nth-child(6) { display: none; }
@@ -752,7 +850,17 @@
     </div>
 
     <div class="card">
-      <div class="card-header"><div class="card-title">Реестр операций</div></div>
+      <div class="card-header">
+        <div class="card-title">Реестр операций</div>
+        <div class="search-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="searchInput" class="search-input" placeholder="Поиск по таблице…" autocomplete="off">
+          <button type="button" class="search-clear" id="searchClear" aria-label="Очистить">×</button>
+        </div>
+      </div>
       <div class="table-wrap">
         <table>
           <thead>
@@ -774,6 +882,7 @@
           <button class="secondary" id="loadMoreBtn">Показать ещё 50</button>
         </div>
       </div>
+      <div class="search-hint">Подсказка: <span class="kbd">Ctrl</span> + <span class="kbd">K</span> — быстрый поиск</div>
     </div>
 
   </div>
@@ -784,9 +893,9 @@
 // 🔐 ПАРОЛЬ ДЛЯ ВХОДА
 // Измените на свой. Запомните его!
 // ============================================
-const ACCESS_PASSWORD = 'lera1569';
+const ACCESS_PASSWORD = 'finance2026';
 
-// Время жизни сессии в миллисекундах (30 дней)
+// Время жизни сессии (30 дней)
 const SESSION_DURATION = 30 * 24 * 60 * 60 * 1000;
 const SESSION_KEY = 'finance_session_until';
 
@@ -818,6 +927,8 @@ let limitCount = 50;
 const LIMIT_STEP = 50;
 let lastDocCount = 0;
 let isAuthenticated = false;
+let searchQuery = '';
+let searchTimeout = null;
 
 // ========== TOAST ==========
 function showToast(message, type = 'info') {
@@ -840,14 +951,8 @@ function isSessionValid() {
   const until = Number(localStorage.getItem(SESSION_KEY) || 0);
   return until > Date.now();
 }
-
-function startSession() {
-  localStorage.setItem(SESSION_KEY, String(Date.now() + SESSION_DURATION));
-}
-
-function endSession() {
-  localStorage.removeItem(SESSION_KEY);
-}
+function startSession() { localStorage.setItem(SESSION_KEY, String(Date.now() + SESSION_DURATION)); }
+function endSession() { localStorage.removeItem(SESSION_KEY); }
 
 // ========== ПОКАЗ / СКРЫТИЕ ЭКРАНОВ ==========
 function showLogin() {
@@ -950,17 +1055,68 @@ function populateCategoryFilter() {
   if (categories.includes(current)) select.value = current;
 }
 
-// ========== ФИЛЬТРАЦИЯ ==========
+// ========== ПОИСК ==========
+const searchInput = document.getElementById('searchInput');
+const searchClear = document.getElementById('searchClear');
+
+searchInput.addEventListener('input', (e) => {
+  const val = e.target.value;
+  searchClear.classList.toggle('visible', val.length > 0);
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    searchQuery = val.trim().toLowerCase();
+    render();
+  }, 250);
+});
+
+searchClear.addEventListener('click', () => {
+  searchInput.value = '';
+  searchQuery = '';
+  searchClear.classList.remove('visible');
+  searchInput.focus();
+  render();
+});
+
+// Ctrl+K / Cmd+K — фокус на поиск
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault();
+    searchInput.focus();
+    searchInput.select();
+  }
+  if (e.key === 'Escape' && document.activeElement === searchInput) {
+    if (searchInput.value) {
+      searchInput.value = '';
+      searchQuery = '';
+      searchClear.classList.remove('visible');
+      render();
+    } else {
+      searchInput.blur();
+    }
+  }
+});
+
+// ========== ФИЛЬТРАЦИЯ (с учётом поиска) ==========
 function getFiltered() {
   const type = document.getElementById('filterType').value;
   const category = document.getElementById('filterCategory').value;
   const dateFrom = document.getElementById('filterDateFrom').value;
   const dateTo = document.getElementById('filterDateTo').value;
+
   return allRecords.filter(r => {
     if (type !== 'all' && r.type !== type) return false;
     if (category !== 'all' && r.category !== category) return false;
     if (dateFrom && r.date < dateFrom) return false;
     if (dateTo && r.date > dateTo) return false;
+
+    if (searchQuery) {
+      const haystack = [
+        r.month, r.date, r.category, r.description, r.note,
+        r.type === 'income' ? 'приход' : 'расход',
+        String(r.amount || '')
+      ].map(v => String(v == null ? '' : v).toLowerCase()).join(' ');
+      if (!haystack.includes(searchQuery)) return false;
+    }
     return true;
   });
 }
@@ -968,6 +1124,25 @@ function getFiltered() {
 // ========== ЭКРАНИРОВАНИЕ ==========
 function esc(s) {
   return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ========== ПОДСВЕТКА СОВПАДЕНИЙ ==========
+function highlight(text, query) {
+  const str = String(text == null ? '' : text);
+  if (!query) return esc(str);
+  const lowerStr = str.toLowerCase();
+  const lowerQuery = query.toLowerCase();
+  let result = '';
+  let lastIndex = 0;
+  let index = lowerStr.indexOf(lowerQuery);
+  while (index !== -1) {
+    result += esc(str.slice(lastIndex, index));
+    result += '<mark>' + esc(str.slice(index, index + query.length)) + '</mark>';
+    lastIndex = index + query.length;
+    index = lowerStr.indexOf(lowerQuery, lastIndex);
+  }
+  result += esc(str.slice(lastIndex));
+  return result;
 }
 
 // ========== ОТРИСОВКА ==========
@@ -981,6 +1156,14 @@ function render() {
     tbody.innerHTML = '';
     emptyMsg.style.display = 'block';
     loadMoreWrap.style.display = 'none';
+
+    if (searchQuery) {
+      emptyMsg.classList.add('searching');
+      emptyMsg.innerHTML = `Ничего не найдено по запросу<br><span class="empty-query">${esc(searchQuery)}</span>`;
+    } else {
+      emptyMsg.classList.remove('searching');
+      emptyMsg.innerHTML = 'Записей нет';
+    }
   } else {
     emptyMsg.style.display = 'none';
     tbody.innerHTML = filtered.map(r => {
@@ -988,12 +1171,12 @@ function render() {
       const badge = isIncome ? '<span class="badge badge-income">Приход</span>' : '<span class="badge badge-expense">Расход</span>';
       return `
         <tr>
-          <td>${esc(r.month) || '—'}</td>
-          <td>${esc(r.date) || '—'}</td>
+          <td>${highlight(r.month || '—', searchQuery)}</td>
+          <td>${highlight(r.date || '—', searchQuery)}</td>
           <td>${badge}</td>
-          <td>${esc(r.category) || '—'}</td>
-          <td class="num ${isIncome ? 'income' : 'expense'}">${fmt(r.amount)}</td>
-          <td>${esc(r.description) || '—'}</td>
+          <td>${highlight(r.category || '—', searchQuery)}</td>
+          <td class="num ${isIncome ? 'income' : 'expense'}">${highlight(fmt(r.amount), searchQuery)}</td>
+          <td>${highlight(r.description || '—', searchQuery)}</td>
           <td class="actions">
             <button class="edit-btn" onclick="startEdit('${r.id}')" title="Редактировать">✏️</button>
             <button class="delete-btn" onclick="deleteRecord('${r.id}')" title="Удалить">🗑️</button>
@@ -1155,11 +1338,7 @@ document.getElementById('resetFilters').addEventListener('click', () => {
 });
 
 // ========== СТАРТ ==========
-if (isSessionValid()) {
-  showApp();
-} else {
-  showLogin();
-}
+if (isSessionValid()) { showApp(); } else { showLogin(); }
 </script>
 </body>
 </html>
