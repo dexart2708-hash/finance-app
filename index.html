@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Учёт приходов и расходов</title>
+
+  <!-- Firebase compat -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <!-- SheetJS (стабильный CDN cdnjs) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <!-- Inter — корпоративный шрифт -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg:            #f5f6f8;
+      --surface:       #ffffff;
+      --surface-alt:   #fafbfc;
+      --border:        #e5e7eb;
+      --border-strong: #d1d5db;
+
+      --text:          #111827;
+      --text-muted:    #6b7280;
+      --text-subtle:   #9ca3af;
+
+      --accent:        #111827;   /* тёмный графит — основной */
+      --accent-hover:  #1f2937;
+      --accent-soft:   #f3f4f6;
+
+      --income:        #047857;   /* сдержанный зелёный */
+      --expense:       #b91c1c;   /* сдержанный красный */
+
+      --radius:        6px;
+      --radius-sm:     4px;
+
+      --shadow-sm:     0 1px 2px rgba(17, 24, 39, 0.04);
+      --shadow:        0 1px 3px rgba(17, 24, 39, 0.06), 0 1px 2px rgba(17, 24, 39, 0.04);
+
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      font-feature-settings: 'cv02','cv03','cv04','cv11','tnum';
+      line-height: 1.5;
+    }
+
+    body { padding: 32px 24px; }
+
+    .container { max-width: 1280px; margin: 0 auto; }
+
+    /* ============ ЗАГОЛОВОК СТРАНИЦЫ ============ */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .page-title {
+      font-size: 1.375rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+    .page-subtitle {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ============ КАРТОЧКИ ============ */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      letter-spacing: -0.005em;
+      color: var(--text);
+      text-transform: none;
+    }
+
+    /* ============ ПОЛЯ ============ */
+    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+    .field { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 140px; }
+
+    label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.01em;
+    }
+
+    input, select {
+      font-family: var(--font);
+      font-size: 0.875rem;
+      font-weight: 400;
+      padding: 8px 12px;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      width: 100%;
+    }
+    input:hover, select:hover { border-color: #9ca3af; }
+    input:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.08);
+    }
+    input::placeholder { color: var(--text-subtle); }
+    input[type="number"] { font-variant-numeric: tabular-nums; }
+
+    select {
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 32px;
+    }
+
+    /* ============ КНОПКИ ============ */
+    button {
+      font-family: var(--font);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      letter-spacing: 0.005em;
+      padding: 8px 16px;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+      white-space: nowrap;
+      background: var(--accent);
+      color: #fff;
+    }
+    button:hover { background: var(--accent-hover); }
+
+    button.secondary {
+      background: var(--surface);
+      color: var(--text);
+      border-color: var(--border-strong);
+    }
+    button.secondary:hover { background: var(--accent-soft); border-color: #9ca3af; }
+
+    button.success {
+      background: var(--surface);
+      color: var(--income);
+      border-color: #a7d3c0;
+    }
+    button.success:hover { background: #ecfdf5; border-color: #6ee7b7; }
+
+    /* ============ ТАБЛИЦА ============ */
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+
+    thead th {
+      background: var(--surface-alt);
+      font-weight: 500;
+      font-size: 0.6875rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    tbody td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      vertical-align: middle;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #fafbfc; }
+
+    td.num, th.num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: 'tnum';
+    }
+
+    .income  { color: var(--income);  font-weight: 500; }
+    .expense { color: var(--expense); font-weight: 500; }
+
+    /* Бейдж типа */
+    .badge {
+      display: inline-block;
+      font-size: 0.6875rem;
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: 3px;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+    }
+    .badge-income  { background: #ecfdf5; color: #065f46; border: 1px solid #d1fae5; }
+    .badge-expense { background: #fef2f2; color: #991b1b; border: 1px solid #fee2e2; }
+
+    /* ============ ОТЧЁТ ============ */
+    .report {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .report-item {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px 18px;
+    }
+    .report-item .label {
+      font-size: 0.6875rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+    .report-item .value {
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+      color: var(--text);
+      line-height: 1.1;
+    }
+    .report-item .value.income  { color: var(--income); }
+    .report-item .value.expense { color: var(--expense); }
+
+    /* ============ ПУСТОЕ СОСТОЯНИЕ ============ */
+    .empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+      font-size: 0.8125rem;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ============ ДЕЙСТВИЯ В СТРОКЕ ============ */
+    .actions { display: flex; gap: 4px; justify-content: flex-end; }
+    .actions button {
+      padding: 0;
+      width: 28px; height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid transparent;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .actions button:hover {
+      background: var(--accent-soft);
+      color: var(--text);
+      border-color: var(--border);
+    }
+    .actions .delete-btn:hover {
+      background: #fef2f2;
+      color: var(--expense);
+      border-color: #fee2e2;
+    }
+
+    /* ============ БЕЙДЖ РЕДАКТИРОВАНИЯ ============ */
+    .editing-badge {
+      display: inline-block;
+      font-size: 0.6875rem;
+      font-weight: 500;
+      color: #92400e;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      padding: 2px 8px;
+      border-radius: 3px;
+      margin-left: 8px;
+      letter-spacing: 0.01em;
+    }
+
+    /* ============ АДАПТИВ ============ */
+    @media (max-width: 720px) {
+      body { padding: 20px 14px; }
+      .row { flex-direction: column; align-items: stretch; }
+      .field { min-width: 100%; }
+      .report { grid-template-columns: 1fr; }
+      .page-title { font-size: 1.15rem; }
+      .report-item .value { font-size: 1.25rem; }
+      thead th, tbody td { padding: 10px 10px; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ЗАГОЛОВОК -->
+  <div class="page-header">
+    <div>
+      <div class="page-title">Учёт приходов и расходов</div>
+      <div class="page-subtitle">Финансовый реестр операций</div>
+    </div>
+  </div>
+
+  <!-- ФОРМА -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title" id="formTitle">Новая запись</div>
+    </div>
+    <form id="addForm">
+      <div class="row">
+        <div class="field">
+          <label>Месяц</label>
+          <select id="month" required>
+            <option value="">— выберите —</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Дата</label>
+          <input type="date" id="date" required>
+        </div>
+        <div class="field">
+          <label>Тип операции</label>
+          <select id="type" required>
+            <option value="income">Приход</option>
+            <option value="expense">Расход</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Статья</label>
+          <input type="text" id="category" placeholder="Зарплата, аренда…" required>
+        </div>
+        <div class="field">
+          <label>Сумма, ₽</label>
+          <input type="number" id="amount" step="0.01" min="0" placeholder="0.00" required>
+        </div>
+        <div class="field" style="flex:2;">
+          <label>Назначение</label>
+          <input type="text" id="description" placeholder="Комментарий к операции">
+        </div>
+        <button type="submit" id="submitBtn">Добавить</button>
+        <button type="button" class="secondary" id="cancelEditBtn" style="display:none;">Отмена</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ФИЛЬТРЫ -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Фильтры</div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label>Тип операции</label>
+        <select id="filterType">
+          <option value="all">Все</option>
+          <option value="income">Только приходы</option>
+          <option value="expense">Только расходы</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Статья</label>
+        <select id="filterCategory">
+          <option value="all">Все статьи</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Дата от</label>
+        <input type="date" id="filterDateFrom">
+      </div>
+      <div class="field">
+        <label>Дата до</label>
+        <input type="date" id="filterDateTo">
+      </div>
+      <button class="secondary" id="resetFilters">Сбросить</button>
+    </div>
+  </div>
+
+  <!-- ОТЧЁТ -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Отчёт за период</div>
+      <button class="success" id="exportBtn">Экспорт в Excel</button>
+    </div>
+    <div class="report">
+      <div class="report-item">
+        <div class="label">Приходы</div>
+        <div class="value income" id="reportIncome">0,00</div>
+      </div>
+      <div class="report-item">
+        <div class="label">Расходы</div>
+        <div class="value expense" id="reportExpense">0,00</div>
+      </div>
+      <div class="report-item">
+        <div class="label">Баланс</div>
+        <div class="value" id="reportBalance">0,00</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ТАБЛИЦА -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Реестр операций</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Месяц</th>
+            <th>Дата</th>
+            <th>Тип</th>
+            <th>Статья</th>
+            <th class="num">Сумма, ₽</th>
+            <th>Назначение</th>
+            <th style="width:80px;"></th>
+          </tr>
+        </thead>
+        <tbody id="recordsBody"></tbody>
+      </table>
+      <div class="empty" id="emptyMsg" style="display:none;">Записей нет</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ========== FIREBASE ==========
+const firebaseConfig = {
+  apiKey: "AIzaSyDdm0kaIesCu4CBennxPVoPhXwyAyAiwIg",
+  authDomain: "chek-listdb.firebaseapp.com",
+  projectId: "chek-listdb",
+  storageBucket: "chek-listdb.firebasestorage.app",
+  messagingSenderId: "966580226421",
+  appId: "1:966580226421:web:af59fd2a1ad92fd4b8eb3c"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const COLLECTION = 'finance_records';
+
+// ========== СОСТОЯНИЕ ==========
+let allRecords = [];
+let unsubscribe = null;
+let editingId = null;
+
+// ========== ФОРМАТ ЧИСЛА: 1 000 000,00 ==========
+const numberFormatter = new Intl.NumberFormat('ru-RU', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2
+});
+function fmt(n) { return numberFormatter.format(Number(n) || 0); }
+
+// ========== МЕСЯЦЫ ==========
+function populateMonthSelect() {
+  const select = document.getElementById('month');
+  const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь',
+                      'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+  const currentYear = new Date().getFullYear();
+  const years = [currentYear, currentYear - 1, currentYear - 2, currentYear + 1];
+
+  let html = '<option value="">— выберите —</option>';
+  years.forEach((y, idx) => {
+    const label = idx === 0 ? `${y} — текущий` : `${y}`;
+    html += `<optgroup label="${label}">`;
+    monthNames.forEach(m => {
+      html += `<option value="${m} ${y}">${m} ${y}</option>`;
+    });
+    html += `</optgroup>`;
+  });
+  select.innerHTML = html;
+}
+
+// ========== FIREBASE REALTIME ==========
+function subscribeToRecords() {
+  if (unsubscribe) unsubscribe();
+  unsubscribe = db.collection(COLLECTION)
+    .orderBy('date', 'desc')
+    .onSnapshot(snapshot => {
+      allRecords = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      populateCategoryFilter();
+      render();
+    }, err => {
+      console.error('Ошибка загрузки:', err);
+      alert('Не удалось загрузить данные. Проверьте правила Firestore.');
+    });
+}
+
+// ========== ФИЛЬТР СТАТЕЙ ==========
+function populateCategoryFilter() {
+  const select = document.getElementById('filterCategory');
+  const current = select.value;
+  const categories = [...new Set(allRecords.map(r => r.category).filter(Boolean))].sort();
+  select.innerHTML = '<option value="all">Все статьи</option>' +
+    categories.map(c => `<option value="${c}">${c}</option>`).join('');
+  if (categories.includes(current)) select.value = current;
+}
+
+// ========== ФИЛЬТРАЦИЯ ==========
+function getFiltered() {
+  const type = document.getElementById('filterType').value;
+  const category = document.getElementById('filterCategory').value;
+  const dateFrom = document.getElementById('filterDateFrom').value;
+  const dateTo = document.getElementById('filterDateTo').value;
+
+  return allRecords.filter(r => {
+    if (type !== 'all' && r.type !== type) return false;
+    if (category !== 'all' && r.category !== category) return false;
+    if (dateFrom && r.date < dateFrom) return false;
+    if (dateTo && r.date > dateTo) return false;
+    return true;
+  });
+}
+
+// ========== ЭКРАНИРОВАНИЕ ==========
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ========== ОТРИСОВКА ==========
+function render() {
+  const filtered = getFiltered();
+  const tbody = document.getElementById('recordsBody');
+  const emptyMsg = document.getElementById('emptyMsg');
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    emptyMsg.style.display = 'block';
+  } else {
+    emptyMsg.style.display = 'none';
+    tbody.innerHTML = filtered.map(r => {
+      const isIncome = r.type === 'income';
+      const badge = isIncome
+        ? '<span class="badge badge-income">Приход</span>'
+        : '<span class="badge badge-expense">Расход</span>';
+      return `
+        <tr>
+          <td>${esc(r.month) || '—'}</td>
+          <td>${esc(r.date) || '—'}</td>
+          <td>${badge}</td>
+          <td>${esc(r.category) || '—'}</td>
+          <td class="num ${isIncome ? 'income' : 'expense'}">${fmt(r.amount)}</td>
+          <td>${esc(r.description) || '—'}</td>
+          <td class="actions">
+            <button class="edit-btn" onclick="startEdit('${r.id}')" title="Редактировать">Изм.</button>
+            <button class="delete-btn" onclick="deleteRecord('${r.id}')" title="Удалить">Удал.</button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  const income = filtered.filter(r => r.type === 'income').reduce((s, r) => s + Number(r.amount), 0);
+  const expense = filtered.filter(r => r.type === 'expense').reduce((s, r) => s + Number(r.amount), 0);
+  document.getElementById('reportIncome').textContent = fmt(income);
+  document.getElementById('reportExpense').textContent = fmt(expense);
+  document.getElementById('reportBalance').textContent = fmt(income - expense);
+}
+
+// ========== ДОБАВЛЕНИЕ / РЕДАКТИРОВАНИЕ ==========
+document.getElementById('addForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const data = {
+    month: document.getElementById('month').value,
+    date: document.getElementById('date').value,
+    type: document.getElementById('type').value,
+    category: document.getElementById('category').value.trim(),
+    amount: parseFloat(document.getElementById('amount').value),
+    description: document.getElementById('description').value.trim()
+  };
+
+  try {
+    if (editingId) {
+      data.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+      await db.collection(COLLECTION).doc(editingId).update(data);
+      cancelEdit();
+    } else {
+      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      await db.collection(COLLECTION).add(data);
+      e.target.reset();
+      document.getElementById('date').valueAsDate = new Date();
+    }
+  } catch (err) {
+    console.error('Ошибка сохранения:', err);
+    alert('Не удалось сохранить запись: ' + err.message);
+  }
+});
+
+// ========== РЕДАКТИРОВАНИЕ ==========
+window.startEdit = (id) => {
+  const r = allRecords.find(x => x.id === id);
+  if (!r) return;
+
+  const monthSelect = document.getElementById('month');
+  if (r.month && ![...monthSelect.options].some(o => o.value === r.month)) {
+    const opt = document.createElement('option');
+    opt.value = r.month;
+    opt.textContent = r.month;
+    monthSelect.appendChild(opt);
+  }
+  monthSelect.value = r.month || '';
+
+  document.getElementById('date').value = r.date || '';
+  document.getElementById('type').value = r.type || 'income';
+  document.getElementById('category').value = r.category || '';
+  document.getElementById('amount').value = r.amount != null ? r.amount : '';
+  document.getElementById('description').value = r.description || '';
+
+  editingId = id;
+  document.getElementById('formTitle').innerHTML = 'Редактирование записи <span class="editing-badge">изменение</span>';
+  document.getElementById('submitBtn').textContent = 'Сохранить';
+  document.getElementById('cancelEditBtn').style.display = 'inline-block';
+  document.getElementById('addForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+
+function cancelEdit() {
+  editingId = null;
+  document.getElementById('addForm').reset();
+  document.getElementById('month').value = '';
+  document.getElementById('date').valueAsDate = new Date();
+  document.getElementById('formTitle').textContent = 'Новая запись';
+  document.getElementById('submitBtn').textContent = 'Добавить';
+  document.getElementById('cancelEditBtn').style.display = 'none';
+}
+document.getElementById('cancelEditBtn').addEventListener('click', cancelEdit);
+
+// ========== УДАЛЕНИЕ ==========
+window.deleteRecord = async (id) => {
+  if (!confirm('Удалить запись?')) return;
+  try {
+    await db.collection(COLLECTION).doc(id).delete();
+    if (editingId === id) cancelEdit();
+  } catch (err) {
+    console.error('Ошибка удаления:', err);
+    alert('Не удалось удалить: ' + err.message);
+  }
+};
+
+// ========== ВЫГРУЗКА В EXCEL ==========
+document.getElementById('exportBtn').addEventListener('click', () => {
+  try {
+    if (typeof XLSX === 'undefined') {
+      alert('Библиотека Excel (SheetJS) не загрузилась.\n' +
+            'Проверьте интернет-соединение или отключите блокировщик рекламы.');
+      return;
+    }
+
+    const filtered = getFiltered();
+    if (filtered.length === 0) {
+      alert('Нет данных для выгрузки (проверьте фильтры).');
+      return;
+    }
+
+    const aoa = [
+      ['Месяц', 'Дата', 'Тип', 'Статья', 'Сумма', 'Назначение']
+    ];
+    filtered.forEach(r => {
+      aoa.push([
+        r.month || '',
+        r.date || '',
+        r.type === 'income' ? 'Приход' : 'Расход',
+        r.category || '',
+        Number(r.amount) || 0,
+        r.description || ''
+      ]);
+    });
+
+    const income = filtered.filter(r => r.type === 'income').reduce((s, r) => s + Number(r.amount), 0);
+    const expense = filtered.filter(r => r.type === 'expense').reduce((s, r) => s + Number(r.amount), 0);
+
+    aoa.push([]);
+    aoa.push(['', '', '', 'Приходы:', income]);
+    aoa.push(['', '', '', 'Расходы:', expense]);
+    aoa.push(['', '', '', 'Баланс:', income - expense]);
+
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+
+    const range = XLSX.utils.decode_range(ws['!ref']);
+    for (let r = 1; r <= range.e.r; r++) {
+      const addr = XLSX.utils.encode_cell({ r, c: 4 });
+      const cell = ws[addr];
+      if (cell && typeof cell.v === 'number') cell.z = '#,##0.00';
+    }
+
+    ws['!cols'] = [
+      { wch: 16 }, { wch: 12 }, { wch: 10 },
+      { wch: 22 }, { wch: 16 }, { wch: 32 }
+    ];
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Отчёт');
+
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const fromV = document.getElementById('filterDateFrom').value || 'all';
+    const toV = document.getElementById('filterDateTo').value || 'all';
+    XLSX.writeFile(wb, `finance_${fromV}_${toV}_${dateStr}.xlsx`);
+  } catch (err) {
+    console.error('Ошибка экспорта в Excel:', err);
+    alert('Ошибка экспорта в Excel:\n' + err.message);
+  }
+});
+
+// ========== СОБЫТИЯ ФИЛЬТРОВ ==========
+['filterType', 'filterCategory', 'filterDateFrom', 'filterDateTo'].forEach(id => {
+  document.getElementById(id).addEventListener('change', render);
+});
+document.getElementById('resetFilters').addEventListener('click', () => {
+  document.getElementById('filterType').value = 'all';
+  document.getElementById('filterCategory').value = 'all';
+  document.getElementById('filterDateFrom').value = '';
+  document.getElementById('filterDateTo').value = '';
+  render();
+});
+
+// ========== СТАРТ ==========
+populateMonthSelect();
+document.getElementById('date').valueAsDate = new Date();
+subscribeToRecords();
+</script>
+</body>
+</html>
