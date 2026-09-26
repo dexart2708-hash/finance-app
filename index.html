@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Учёт приходов и расходов</title>
 
-  <!-- 🚀 Предзагрузка темы (без мигания) -->
+  <!-- 🚀 Предзагрузка темы -->
   <script>
     (function() {
       try {
@@ -18,12 +18,24 @@
     })();
   </script>
 
+  <!-- 🚀 Ускорение загрузки (важно для Safari/macOS) -->
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://firestore.googleapis.com">
+  <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com">
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
   <!-- Firebase compat -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
-  <!-- SheetJS -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <!-- QR-код для регистрации TOTP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <!-- Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,7 +43,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
-    /* ============ СВЕТЛАЯ ТЕМА ============ */
     :root {
       --bg-1:          #f8f9fb;
       --bg-2:          #eef0f3;
@@ -84,7 +95,6 @@
       --transition-slow: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    /* ============ ТЁМНАЯ ТЕМА ============ */
     [data-theme="dark"] {
       --bg-1:          #0a0f1c;
       --bg-2:          #0f172a;
@@ -160,7 +170,6 @@
       transition: background var(--transition);
     }
 
-    /* Валютный фон */
     body::before {
       content: '';
       position: fixed;
@@ -221,27 +230,13 @@
       height: 20px;
       transition: all var(--transition);
     }
-    .icon-sun {
-      opacity: 1;
-      transform: rotate(0deg) scale(1);
-      color: #f59e0b;
-    }
-    .icon-moon {
-      opacity: 0;
-      transform: rotate(90deg) scale(0.5);
-      color: #60a5fa;
-    }
-    [data-theme="dark"] .icon-sun {
-      opacity: 0;
-      transform: rotate(-90deg) scale(0.5);
-    }
-    [data-theme="dark"] .icon-moon {
-      opacity: 1;
-      transform: rotate(0deg) scale(1);
-    }
+    .icon-sun { opacity: 1; transform: rotate(0deg) scale(1); color: #f59e0b; }
+    .icon-moon { opacity: 0; transform: rotate(90deg) scale(0.5); color: #60a5fa; }
+    [data-theme="dark"] .icon-sun { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+    [data-theme="dark"] .icon-moon { opacity: 1; transform: rotate(0deg) scale(1); }
 
-    /* ============ ЭКРАН ЛОГИНА ============ */
-    #loginScreen {
+    /* ============ ЭКРАНЫ ВХОДА / MFA / РЕГИСТРАЦИИ ============ */
+    .auth-screen {
       display: none;
       align-items: center;
       justify-content: center;
@@ -250,7 +245,8 @@
       z-index: 1;
       animation: fadeInUp var(--transition-slow) both;
     }
-    #loginScreen.visible { display: flex; }
+    .auth-screen.visible { display: flex; }
+
     .login-card {
       background: var(--surface);
       backdrop-filter: blur(20px);
@@ -298,9 +294,10 @@
       color: var(--text-muted);
       text-align: center;
       margin-top: 6px;
+      line-height: 1.5;
     }
     .login-form .field { margin-bottom: 16px; }
-    .login-form button { width: 100%; margin-top: 8px; }
+    .login-form button { width: 100%; }
     .login-error {
       background: var(--expense-soft);
       color: var(--expense-text);
@@ -315,11 +312,36 @@
     }
     .login-error.visible { display: block; }
 
+    /* QR-код для TOTP */
+    #qrcode {
+      display: inline-block;
+      padding: 12px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: var(--shadow-sm);
+    }
+    #qrcode img, #qrcode canvas { display: block; }
+
+    .totp-secret {
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+      font-size: 0.875rem;
+      letter-spacing: 2px;
+      color: var(--text);
+      font-weight: 600;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: inline-block;
+      margin-top: 6px;
+      user-select: all;
+      word-break: break-all;
+    }
+
     /* ============ ПРИЛОЖЕНИЕ ============ */
     #app { display: none; position: relative; z-index: 1; }
     #app.visible { display: block; }
 
-    /* ============ ШАПКА ============ */
     .page-header {
       display: flex;
       align-items: center;
@@ -352,11 +374,7 @@
       font-weight: 400;
     }
 
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    .user-info { display: flex; align-items: center; gap: 12px; }
     .user-avatar {
       width: 48px;
       height: 48px;
@@ -369,10 +387,7 @@
       cursor: pointer;
       flex-shrink: 0;
     }
-    .user-avatar:hover {
-      transform: scale(1.08);
-      box-shadow: var(--shadow-md);
-    }
+    .user-avatar:hover { transform: scale(1.08); box-shadow: var(--shadow-md); }
 
     .user-name-wrap {
       display: flex;
@@ -401,15 +416,11 @@
       white-space: nowrap;
     }
 
-    /* ============ АНИМАЦИИ ============ */
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(12px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slideIn {
       from { transform: translateX(110%); opacity: 0; }
       to   { transform: translateX(0); opacity: 1; }
@@ -418,12 +429,8 @@
       from { transform: translateX(0); opacity: 1; }
       to   { transform: translateX(110%); opacity: 0; }
     }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50%      { opacity: 0.6; }
-    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 
-    /* ============ КАРТОЧКИ ============ */
     .card {
       background: var(--surface);
       backdrop-filter: blur(14px);
@@ -436,10 +443,7 @@
       transition: box-shadow var(--transition), border-color var(--transition), background var(--transition);
       animation: fadeInUp var(--transition-slow) both;
     }
-    .card:hover {
-      box-shadow: var(--shadow-md);
-      border-color: var(--border);
-    }
+    .card:hover { box-shadow: var(--shadow-md); border-color: var(--border); }
     .card-header {
       display: flex;
       align-items: center;
@@ -465,7 +469,7 @@
       border-radius: 2px;
     }
 
-    /* ============ ПОИСК ============ */
+    /* Поиск */
     .search-wrap {
       position: relative;
       display: flex;
@@ -543,17 +547,14 @@
       margin: 0 2px;
     }
 
-    /* ============ ПОДСВЕТКА СОВПАДЕНИЙ ============ */
     mark {
       background: var(--mark-bg);
       color: #1e293b;
       padding: 1px 3px;
       border-radius: 3px;
       font-weight: 600;
-      box-shadow: inset 0 -1px 0 rgba(202, 138, 4, 0.2);
     }
 
-    /* ============ ПОЛЯ ============ */
     .row { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end; }
     .field { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 160px; }
 
@@ -597,7 +598,6 @@
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     }
 
-    /* ============ ФИКС ДЛЯ ПОЛЯ ДАТЫ (iOS) ============ */
     input[type="date"] {
       -webkit-appearance: none;
       appearance: none;
@@ -621,7 +621,6 @@
       z-index: 2;
     }
 
-    /* ============ КНОПКИ ============ */
     button {
       font-family: var(--font);
       font-size: 0.875rem;
@@ -697,7 +696,6 @@
       border-color: var(--expense);
     }
 
-    /* ============ ТАБЛИЦА ============ */
     .table-wrap {
       background: var(--surface-solid);
       border: 1px solid var(--border);
@@ -746,7 +744,6 @@
     .badge-income  { background: var(--income-soft); color: var(--income-text); border: 1px solid var(--income-border); }
     .badge-expense { background: var(--expense-soft); color: var(--expense-text); border: 1px solid var(--expense-border); }
 
-    /* ============ ИНЛАЙН-ЗАМЕТКИ ============ */
     .note-input {
       width: 100%;
       min-height: 38px;
@@ -768,7 +765,6 @@
     }
     .note-input::placeholder { color: var(--text-subtle); font-style: italic; }
 
-    /* ============ ОТЧЁТ ============ */
     .report { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
     .report-item {
       background: linear-gradient(180deg, var(--surface-alt) 0%, var(--surface-solid) 100%);
@@ -816,7 +812,6 @@
     .report-item .value.income  { color: var(--income); }
     .report-item .value.expense { color: var(--expense); }
 
-    /* ============ ПУСТОЕ СОСТОЯНИЕ ============ */
     .empty {
       text-align: center;
       padding: 56px 20px;
@@ -843,7 +838,6 @@
       margin-top: 4px;
     }
 
-    /* ============ ДЕЙСТВИЯ ============ */
     .actions { display: flex; gap: 6px; justify-content: flex-end; }
     .actions button {
       padding: 0;
@@ -872,7 +866,6 @@
       border-color: var(--expense-border);
     }
 
-    /* ============ КНОПКА ПОКАЗАТЬ ЕЩЁ ============ */
     .load-more-wrap {
       display: flex;
       justify-content: center;
@@ -888,7 +881,6 @@
       min-height: 44px;
     }
 
-    /* ============ БЕЙДЖ РЕДАКТИРОВАНИЯ ============ */
     .editing-badge {
       display: inline-block;
       font-size: 0.75rem;
@@ -902,7 +894,6 @@
       animation: pulse 2s ease-in-out infinite;
     }
 
-    /* ============ TOAST ============ */
     .toast-container {
       position: fixed;
       top: 24px;
@@ -940,7 +931,6 @@
     .toast-message { flex: 1; word-break: break-word; line-height: 1.4; }
     .toast.hiding { animation: slideOut 0.3s ease forwards; }
 
-    /* ============ АДАПТИВ ============ */
     @media (max-width: 720px) {
       body { padding: 16px 12px; padding-top: calc(16px + env(safe-area-inset-top)); padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
       body::before { background-size: 260px 260px; }
@@ -991,21 +981,71 @@
 
 <div id="toastContainer" class="toast-container"></div>
 
-<!-- ============ ЭКРАН ВХОДА ============ -->
-<div id="loginScreen">
+<!-- ============ ЭКРАН ВХОДА (email + пароль) ============ -->
+<div id="loginScreen" class="auth-screen">
   <div class="login-card">
     <div class="login-logo">
-      <div class="login-logo-icon">💱</div>
+      <div class="login-logo-icon">🔐</div>
       <div class="login-title">Вход в систему</div>
-      <div class="login-subtitle">Введите пароль для доступа к данным</div>
+      <div class="login-subtitle">Введите email и пароль для доступа</div>
     </div>
     <div id="loginError" class="login-error"></div>
     <form class="login-form" id="loginForm">
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="loginEmail" placeholder="your-email@mail.ru" required autocomplete="username">
+      </div>
       <div class="field">
         <label>Пароль</label>
         <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
       </div>
       <button type="submit" id="loginBtn">Войти</button>
+    </form>
+  </div>
+</div>
+
+<!-- ============ ЭКРАН ВВОДА КОДА TOTP ============ -->
+<div id="mfaScreen" class="auth-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">📱</div>
+      <div class="login-title">Двухфакторная аутентификация</div>
+      <div class="login-subtitle">Введите 6-значный код из Google Authenticator</div>
+    </div>
+    <div id="mfaError" class="login-error"></div>
+    <form class="login-form" id="mfaForm">
+      <div class="field">
+        <label>Код из приложения</label>
+        <input type="text" id="mfaCode" placeholder="000000" maxlength="6" inputmode="numeric" pattern="[0-9]*" required autocomplete="one-time-code">
+      </div>
+      <button type="submit" id="mfaBtn">Подтвердить</button>
+      <button type="button" class="secondary" id="mfaCancelBtn" style="width:100%; margin-top:8px;">Отмена</button>
+    </form>
+  </div>
+</div>
+
+<!-- ============ ЭКРАН РЕГИСТРАЦИИ TOTP (при первом входе) ============ -->
+<div id="enrollScreen" class="auth-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">📲</div>
+      <div class="login-title">Настройка 2FA</div>
+      <div class="login-subtitle">Отсканируйте QR-код в Google Authenticator</div>
+    </div>
+    <div id="enrollError" class="login-error"></div>
+    <div style="text-align:center; margin-bottom:20px;">
+      <div id="qrcode"></div>
+    </div>
+    <p style="font-size:0.8125rem; color:var(--text-muted); text-align:center; margin-bottom:16px; line-height:1.6;">
+      Если не можете отсканировать — введите ключ вручную:<br>
+      <span class="totp-secret" id="totpSecret"></span>
+    </p>
+    <form class="login-form" id="enrollForm">
+      <div class="field">
+        <label>Введите код из приложения</label>
+        <input type="text" id="enrollCode" placeholder="000000" maxlength="6" inputmode="numeric" pattern="[0-9]*" required autocomplete="one-time-code">
+      </div>
+      <button type="submit" id="enrollBtn">Завершить настройку</button>
     </form>
   </div>
 </div>
@@ -1020,7 +1060,6 @@
         <div class="page-subtitle">Финансовый реестр операций</div>
       </div>
       <div class="user-info">
-        <!-- Кнопка переключения темы -->
         <button class="theme-toggle" id="themeToggle" aria-label="Переключить тему">
           <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="4"></circle>
@@ -1162,13 +1201,8 @@
 
 <script>
 // ============================================
-// 🔐 ПАРОЛЬ ДЛЯ ВХОДА
+// FIREBASE
 // ============================================
-const ACCESS_PASSWORD = 'finance2026';
-const SESSION_DURATION = 30 * 24 * 60 * 60 * 1000;
-const SESSION_KEY = 'finance_session_until';
-
-// ========== FIREBASE ==========
 const firebaseConfig = {
   apiKey: "AIzaSyDdm0kaIesCu4CBennxPVoPhXwyAyAiwIg",
   authDomain: "chek-listdb.firebaseapp.com",
@@ -1180,6 +1214,7 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const auth = firebase.auth();
 
 db.enablePersistence({ synchronizeTabs: true }).catch(err => {
   if (err.code === 'failed-precondition') console.warn('Офлайн: несколько вкладок.');
@@ -1188,31 +1223,24 @@ db.enablePersistence({ synchronizeTabs: true }).catch(err => {
 
 const COLLECTION = 'finance_records';
 
-// ========== СОСТОЯНИЕ ==========
+// ============================================
+// СОСТОЯНИЕ
+// ============================================
 let allRecords = [];
 let unsubscribe = null;
 let editingId = null;
 let limitCount = 50;
 const LIMIT_STEP = 50;
 let lastDocCount = 0;
-let isAuthenticated = false;
+let currentUser = null;
 let searchQuery = '';
 let searchTimeout = null;
+let mfaResolver = null;
+let totpSecret = null;
 
-// ========== ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ ==========
-const themeToggle = document.getElementById('themeToggle');
-
-themeToggle.addEventListener('click', () => {
-  const current = document.documentElement.getAttribute('data-theme');
-  const next = current === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('theme', next);
-
-  const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute('content', next === 'dark' ? '#0f172a' : '#ffffff');
-});
-
-// ========== TOAST ==========
+// ============================================
+// TOAST
+// ============================================
 function showToast(message, type = 'info') {
   const container = document.getElementById('toastContainer');
   const toast = document.createElement('div');
@@ -1228,66 +1256,233 @@ function showToast(message, type = 'info') {
   }, 3500);
 }
 
-// ========== ПРОВЕРКА СЕССИИ ==========
-function isSessionValid() {
-  const until = Number(localStorage.getItem(SESSION_KEY) || 0);
-  return until > Date.now();
-}
-function startSession() { localStorage.setItem(SESSION_KEY, String(Date.now() + SESSION_DURATION)); }
-function endSession() { localStorage.removeItem(SESSION_KEY); }
+// ============================================
+// ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ
+// ============================================
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+});
 
-// ========== ПОКАЗ / СКРЫТИЕ ЭКРАНОВ ==========
-function showLogin() {
-  isAuthenticated = false;
-  document.getElementById('loginScreen').classList.add('visible');
+// ============================================
+// УПРАВЛЕНИЕ ЭКРАНАМИ
+// ============================================
+function showScreen(screen) {
+  document.querySelectorAll('.auth-screen').forEach(el => el.classList.remove('visible'));
   document.getElementById('app').classList.remove('visible');
-  if (unsubscribe) { unsubscribe(); unsubscribe = null; }
-  allRecords = [];
-  setTimeout(() => document.getElementById('loginPassword').focus(), 100);
+
+  if (screen === 'login') document.getElementById('loginScreen').classList.add('visible');
+  if (screen === 'mfa') document.getElementById('mfaScreen').classList.add('visible');
+  if (screen === 'enroll') document.getElementById('enrollScreen').classList.add('visible');
+  if (screen === 'app') document.getElementById('app').classList.add('visible');
 }
 
 function showApp() {
-  isAuthenticated = true;
-  document.getElementById('loginScreen').classList.remove('visible');
-  document.getElementById('app').classList.add('visible');
+  showScreen('app');
   populateMonthSelect();
   document.getElementById('date').valueAsDate = new Date();
   subscribeToRecords();
 }
 
-// ========== ФОРМА ВХОДА ==========
-document.getElementById('loginForm').addEventListener('submit', (e) => {
-  e.preventDefault();
-  const input = document.getElementById('loginPassword').value;
-  const errBox = document.getElementById('loginError');
-  errBox.classList.remove('visible');
+function showLogin() {
+  if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+  allRecords = [];
+  showScreen('login');
+  document.getElementById('loginEmail').value = '';
+  document.getElementById('loginPassword').value = '';
+  document.getElementById('loginError').classList.remove('visible');
+  setTimeout(() => document.getElementById('loginEmail').focus(), 100);
+}
 
-  if (input === ACCESS_PASSWORD) {
-    startSession();
-    document.getElementById('loginPassword').value = '';
-    showApp();
-    showToast('Добро пожаловать!', 'success');
-  } else {
-    errBox.textContent = 'Неверный пароль. Попробуйте ещё раз.';
-    errBox.classList.add('visible');
-    document.getElementById('loginPassword').value = '';
-    document.getElementById('loginPassword').focus();
+// ============================================
+// ФОРМА ВХОДА
+// ============================================
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const btn = document.getElementById('loginBtn');
+  const errBox = document.getElementById('loginError');
+
+  errBox.classList.remove('visible');
+  btn.disabled = true;
+  btn.textContent = 'Проверка…';
+
+  try {
+    await auth.signInWithEmailAndPassword(email, password);
+    // Если MFA нужна — сработает исключение ниже. Если нет — onAuthStateChanged.
+  } catch (err) {
+    if (err.code === 'auth/multi-factor-auth-required') {
+      mfaResolver = firebase.auth().getMultiFactorResolver(err);
+      showScreen('mfa');
+      document.getElementById('mfaCode').value = '';
+      document.getElementById('mfaError').classList.remove('visible');
+      setTimeout(() => document.getElementById('mfaCode').focus(), 100);
+      showToast('Введите код из Google Authenticator', 'info');
+    } else {
+      let msg = 'Не удалось войти.';
+      if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') msg = 'Неверный email или пароль.';
+      else if (err.code === 'auth/user-not-found') msg = 'Пользователь не найден.';
+      else if (err.code === 'auth/invalid-email') msg = 'Некорректный email.';
+      else if (err.code === 'auth/too-many-requests') msg = 'Слишком много попыток. Попробуйте позже.';
+      else if (err.code === 'auth/network-request-failed') msg = 'Нет соединения. Проверьте интернет.';
+      else msg = err.message;
+      errBox.textContent = msg;
+      errBox.classList.add('visible');
+      document.getElementById('loginPassword').value = '';
+      document.getElementById('loginPassword').focus();
+    }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Войти';
   }
 });
 
-// ========== ВЫХОД ==========
-document.getElementById('logoutBtn').addEventListener('click', () => {
-  if (!confirm('Выйти из системы?')) return;
-  endSession();
-  showLogin();
-  showToast('Вы вышли из системы', 'info');
+// ============================================
+// ФОРМА MFA
+// ============================================
+document.getElementById('mfaForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const code = document.getElementById('mfaCode').value.trim();
+  const btn = document.getElementById('mfaBtn');
+  const errBox = document.getElementById('mfaError');
+
+  if (!code || code.length !== 6) {
+    errBox.textContent = 'Введите 6-значный код.';
+    errBox.classList.add('visible');
+    return;
+  }
+
+  errBox.classList.remove('visible');
+  btn.disabled = true;
+  btn.textContent = 'Проверка…';
+
+  try {
+    const hint = mfaResolver.hints.find(h => h.factorId === 'totp');
+    if (!hint) throw new Error('TOTP-фактор не найден');
+
+    const assertion = firebase.auth.TotpMultiFactorGenerator.assertionForSignIn(hint.uid, code);
+    await mfaResolver.resolveSignIn(assertion);
+    showToast('Вход выполнен!', 'success');
+  } catch (err) {
+    console.error('MFA error:', err);
+    errBox.textContent = 'Неверный код. Попробуйте ещё раз.';
+    errBox.classList.add('visible');
+    document.getElementById('mfaCode').value = '';
+    document.getElementById('mfaCode').focus();
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Подтвердить';
+  }
 });
 
-// ========== ФОРМАТ ЧИСЛА ==========
+document.getElementById('mfaCancelBtn').addEventListener('click', async () => {
+  mfaResolver = null;
+  try { await auth.signOut(); } catch (e) {}
+  showLogin();
+});
+
+// ============================================
+// РЕГИСТРАЦИЯ TOTP
+// ============================================
+async function startEnrollment(user) {
+  try {
+    const multiFactorSession = await firebase.auth().multiFactor(user).getSession();
+    totpSecret = await firebase.auth.TotpMultiFactorGenerator.generateSecret(multiFactorSession);
+
+    const qrContainer = document.getElementById('qrcode');
+    qrContainer.innerHTML = '';
+    const qrUrl = totpSecret.generateQrCodeUrl(user.email, 'Finance Valeeryyy');
+    new QRCode(qrContainer, { text: qrUrl, width: 180, height: 180 });
+
+    document.getElementById('totpSecret').textContent = totpSecret.secretKey;
+
+    showScreen('enroll');
+    document.getElementById('enrollCode').value = '';
+    document.getElementById('enrollError').classList.remove('visible');
+    setTimeout(() => document.getElementById('enrollCode').focus(), 100);
+  } catch (err) {
+    console.error('Ошибка регистрации TOTP:', err);
+    showToast('Не удалось начать настройку 2FA: ' + err.message, 'error');
+    showApp();
+  }
+}
+
+document.getElementById('enrollForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const code = document.getElementById('enrollCode').value.trim();
+  const btn = document.getElementById('enrollBtn');
+  const errBox = document.getElementById('enrollError');
+
+  if (!code || code.length !== 6) {
+    errBox.textContent = 'Введите 6-значный код.';
+    errBox.classList.add('visible');
+    return;
+  }
+
+  errBox.classList.remove('visible');
+  btn.disabled = true;
+  btn.textContent = 'Сохранение…';
+
+  try {
+    const user = auth.currentUser;
+    const assertion = firebase.auth.TotpMultiFactorGenerator.assertionForEnrollment(totpSecret, code);
+    await firebase.auth().multiFactor(user).enroll(assertion, 'Google Authenticator');
+    showToast('2FA успешно настроена!', 'success');
+    showApp();
+  } catch (err) {
+    console.error('Ошибка завершения TOTP:', err);
+    errBox.textContent = 'Неверный код. Проверьте и попробуйте снова.';
+    errBox.classList.add('visible');
+    document.getElementById('enrollCode').value = '';
+    document.getElementById('enrollCode').focus();
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Завершить настройку';
+  }
+});
+
+// ============================================
+// ОТСЛЕЖИВАНИЕ АУТЕНТИФИКАЦИИ
+// ============================================
+auth.onAuthStateChanged(async (user) => {
+  currentUser = user;
+  if (user) {
+    const factors = user.multiFactor?.enrolledFactors || [];
+    if (factors.length === 0) {
+      await startEnrollment(user);
+    } else {
+      showApp();
+    }
+  } else {
+    showLogin();
+  }
+});
+
+// ============================================
+// ВЫХОД
+// ============================================
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  if (!confirm('Выйти из системы?')) return;
+  try {
+    await auth.signOut();
+    showToast('Вы вышли из системы', 'info');
+  } catch (err) {
+    showToast('Ошибка выхода: ' + err.message, 'error');
+  }
+});
+
+// ============================================
+// ФОРМАТ ЧИСЛА
+// ============================================
 const numberFormatter = new Intl.NumberFormat('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 function fmt(n) { return numberFormatter.format(Number(n) || 0); }
 
-// ========== МЕСЯЦЫ ==========
+// ============================================
+// МЕСЯЦЫ
+// ============================================
 function populateMonthSelect() {
   const select = document.getElementById('month');
   const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
@@ -1303,9 +1498,11 @@ function populateMonthSelect() {
   select.innerHTML = html;
 }
 
-// ========== FIREBASE REALTIME ==========
+// ============================================
+// FIREBASE REALTIME
+// ============================================
 function subscribeToRecords() {
-  if (!isAuthenticated) return;
+  if (!currentUser) return;
   if (unsubscribe) unsubscribe();
   unsubscribe = db.collection(COLLECTION)
     .orderBy('date', 'desc')
@@ -1318,11 +1515,13 @@ function subscribeToRecords() {
       render();
     }, err => {
       console.error('Ошибка загрузки:', err);
-      showToast('Не удалось загрузить данные. Проверьте правила Firestore.', 'error');
+      showToast('Не удалось загрузить данные.', 'error');
     });
 }
 
-// ========== АВТОДОПОЛНЕНИЕ СТАТЕЙ ==========
+// ============================================
+// АВТОДОПОЛНЕНИЕ СТАТЕЙ
+// ============================================
 function populateCategoryDatalist() {
   const datalist = document.getElementById('category-list');
   const categories = [...new Set(allRecords.map(r => r.category).filter(Boolean))].sort();
@@ -1337,7 +1536,9 @@ function populateCategoryFilter() {
   if (categories.includes(current)) select.value = current;
 }
 
-// ========== ПОИСК ==========
+// ============================================
+// ПОИСК
+// ============================================
 const searchInput = document.getElementById('searchInput');
 const searchClear = document.getElementById('searchClear');
 
@@ -1377,7 +1578,9 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// ========== ФИЛЬТРАЦИЯ ==========
+// ============================================
+// ФИЛЬТРАЦИЯ
+// ============================================
 function getFiltered() {
   const type = document.getElementById('filterType').value;
   const category = document.getElementById('filterCategory').value;
@@ -1402,12 +1605,13 @@ function getFiltered() {
   });
 }
 
-// ========== ЭКРАНИРОВАНИЕ ==========
+// ============================================
+// ЭКРАНИРОВАНИЕ
+// ============================================
 function esc(s) {
   return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
-// ========== ПОДСВЕТКА ==========
 function highlight(text, query) {
   const str = String(text == null ? '' : text);
   if (!query) return esc(str);
@@ -1426,7 +1630,9 @@ function highlight(text, query) {
   return result;
 }
 
-// ========== ОТРИСОВКА ==========
+// ============================================
+// ОТРИСОВКА
+// ============================================
 function render() {
   const filtered = getFiltered();
   const tbody = document.getElementById('recordsBody');
@@ -1437,7 +1643,6 @@ function render() {
     tbody.innerHTML = '';
     emptyMsg.style.display = 'block';
     loadMoreWrap.style.display = 'none';
-
     if (searchQuery) {
       emptyMsg.classList.add('searching');
       emptyMsg.innerHTML = `Ничего не найдено по запросу<br><span class="empty-query">${esc(searchQuery)}</span>`;
@@ -1478,9 +1683,11 @@ function render() {
   document.getElementById('reportBalance').textContent = fmt(income - expense);
 }
 
-// ========== СОХРАНЕНИЕ ЗАМЕТКИ ==========
+// ============================================
+// СОХРАНЕНИЕ ЗАМЕТКИ
+// ============================================
 window.updateNote = async (id, text) => {
-  if (!isAuthenticated) return;
+  if (!currentUser) return;
   try {
     await db.collection(COLLECTION).doc(id).update({ note: text.trim() });
   } catch (err) {
@@ -1489,17 +1696,21 @@ window.updateNote = async (id, text) => {
   }
 };
 
-// ========== КНОПКА "ПОКАЗАТЬ ЕЩЁ" ==========
+// ============================================
+// КНОПКА "ПОКАЗАТЬ ЕЩЁ"
+// ============================================
 document.getElementById('loadMoreBtn').addEventListener('click', () => {
   limitCount += LIMIT_STEP;
   showToast(`Загружаем ещё ${LIMIT_STEP} записей…`, 'info');
   subscribeToRecords();
 });
 
-// ========== ДОБАВЛЕНИЕ / РЕДАКТИРОВАНИЕ ==========
+// ============================================
+// ДОБАВЛЕНИЕ / РЕДАКТИРОВАНИЕ
+// ============================================
 document.getElementById('addForm').addEventListener('submit', async (e) => {
   e.preventDefault();
-  if (!isAuthenticated) return;
+  if (!currentUser) return;
   const data = {
     month: document.getElementById('month').value,
     date: document.getElementById('date').value,
@@ -1527,7 +1738,9 @@ document.getElementById('addForm').addEventListener('submit', async (e) => {
   }
 });
 
-// ========== РЕДАКТИРОВАНИЕ ==========
+// ============================================
+// РЕДАКТИРОВАНИЕ
+// ============================================
 window.startEdit = (id) => {
   const r = allRecords.find(x => x.id === id);
   if (!r) return;
@@ -1561,9 +1774,11 @@ function cancelEdit() {
 }
 document.getElementById('cancelEditBtn').addEventListener('click', cancelEdit);
 
-// ========== УДАЛЕНИЕ ==========
+// ============================================
+// УДАЛЕНИЕ
+// ============================================
 window.deleteRecord = async (id) => {
-  if (!isAuthenticated) return;
+  if (!currentUser) return;
   if (!confirm('Удалить запись?')) return;
   try {
     await db.collection(COLLECTION).doc(id).delete();
@@ -1575,12 +1790,28 @@ window.deleteRecord = async (id) => {
   }
 };
 
-// ========== ВЫГРУЗКА В EXCEL ==========
-document.getElementById('exportBtn').addEventListener('click', () => {
+// ============================================
+// ЭКСПОРТ В EXCEL (ленивая загрузка SheetJS)
+// ============================================
+async function loadXLSX() {
+  if (window.XLSX) return window.XLSX;
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    script.onload = () => resolve(window.XLSX);
+    script.onerror = () => reject(new Error('Не удалось загрузить библиотеку Excel'));
+    document.head.appendChild(script);
+  });
+}
+
+document.getElementById('exportBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('exportBtn');
+  btn.disabled = true;
+  btn.textContent = 'Загрузка…';
   try {
-    if (typeof XLSX === 'undefined') { showToast('Библиотека Excel не загрузилась.', 'error'); return; }
+    await loadXLSX();
     const filtered = getFiltered();
-    if (filtered.length === 0) { showToast('Нет данных для выгрузки (проверьте фильтры)', 'info'); return; }
+    if (filtered.length === 0) { showToast('Нет данных для выгрузки', 'info'); return; }
     const aoa = [['Месяц', 'Дата', 'Тип', 'Статья', 'Сумма', 'Назначение', 'Заметка']];
     filtered.forEach(r => {
       aoa.push([r.month || '', r.date || '', r.type === 'income' ? 'Приход' : 'Расход', r.category || '', Number(r.amount) || 0, r.description || '', r.note || '']);
@@ -1603,10 +1834,15 @@ document.getElementById('exportBtn').addEventListener('click', () => {
   } catch (err) {
     console.error('Ошибка экспорта:', err);
     showToast('Ошибка экспорта: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Экспорт в Excel';
   }
 });
 
-// ========== СОБЫТИЯ ФИЛЬТРОВ ==========
+// ============================================
+// СОБЫТИЯ ФИЛЬТРОВ
+// ============================================
 ['filterType', 'filterCategory', 'filterDateFrom', 'filterDateTo'].forEach(id => {
   document.getElementById(id).addEventListener('change', render);
 });
@@ -1618,8 +1854,24 @@ document.getElementById('resetFilters').addEventListener('click', () => {
   render();
 });
 
-// ========== СТАРТ ============
-if (isSessionValid()) { showApp(); } else { showLogin(); }
+// ============================================
+// SERVICE WORKER (ускорение повторных визитов)
+// ============================================
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(err => {
+      console.warn('SW не зарегистрирован:', err);
+    });
+  });
+}
+
+// ============================================
+// СТАРТ
+// onAuthStateChanged сам решит, что показать:
+//  - если пользователь не вошёл → экран login
+//  - если вошёл без TOTP → экран enroll (регистрация 2FA)
+//  - если вошёл с TOTP → приложение
+// ============================================
 </script>
 </body>
 </html>
