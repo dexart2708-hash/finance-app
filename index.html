@@ -1321,7 +1321,8 @@ onAuthStateChanged(auth, async (user) => {
       return;
     }
 
-    // Перезагружаем user, чтобы получить актуальные enrolledFactors
+    // ✅ Принудительно обновляем ID-токен и пользователя, чтобы enrolledFactors точно были свежими
+    try { await user.getIdToken(true); } catch (e) { console.warn('[getIdToken]', e); }
     try { await user.reload(); } catch (e) { console.warn('[reload]', e); }
     const freshUser = auth.currentUser;
     currentUser = freshUser;
@@ -1330,7 +1331,17 @@ onAuthStateChanged(auth, async (user) => {
     console.log('[AUTH] Вошёл:', freshUser.email, '| TOTP-факторов:', factors.length);
 
     if (factors.length === 0) {
-      await startEnrollment(freshUser);
+      // ✅ Защита: если enrollment уже идёт, не запускаем повторно
+      if (window.__enrolling) {
+        console.log('[AUTH] Enrollment уже идёт, пропускаем');
+        return;
+      }
+      window.__enrolling = true;
+      try {
+        await startEnrollment(freshUser);
+      } finally {
+        window.__enrolling = false;
+      }
     } else {
       showApp();
     }
