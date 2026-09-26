@@ -30,6 +30,10 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script type="module">
+    import { getAuth, getMultiFactorResolver, TotpMultiFactorGenerator, multiFactor } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+    window.ModAuth = { getAuth, getMultiFactorResolver, TotpMultiFactorGenerator, multiFactor };
+  </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
@@ -924,7 +928,8 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     await auth.signInWithEmailAndPassword(email, password);
   } catch (err) {
     if (err.code === 'auth/multi-factor-auth-required') {
-      mfaResolver = firebase.auth().getMultiFactorResolver(err);
+      const authMod = window.ModAuth.getAuth(firebase.app());
+      mfaResolver = window.ModAuth.getMultiFactorResolver(authMod, err);
       showScreen('mfa');
       document.getElementById('mfaCode').value = '';
       document.getElementById('mfaError').classList.remove('visible');
@@ -972,7 +977,7 @@ document.getElementById('mfaForm').addEventListener('submit', async (e) => {
     const hint = mfaResolver.hints.find(h => h.factorId === 'totp');
     if (!hint) throw new Error('TOTP-фактор не найден');
 
-    const assertion = firebase.auth.TotpMultiFactorGenerator.assertionForSignIn(hint.uid, code);
+    const assertion = window.ModAuth.TotpMultiFactorGenerator.assertionForSignIn(hint.uid, code);
     await mfaResolver.resolveSignIn(assertion);
     showToast('Вход выполнен!', 'success');
   } catch (err) {
@@ -1002,10 +1007,12 @@ async function startEnrollment(user) {
     console.log('[2FA] User email:', user?.email);
 
     // ✅ Правильный вызов в compat-версии Firebase
-    const multiFactorSession = await user.multiFactor.getSession();
+    const authMod = window.ModAuth.getAuth(firebase.app());
+    const mfUser = window.ModAuth.multiFactor(authMod.currentUser);
+    const multiFactorSession = await mfUser.getSession();
     console.log('[2FA] Сессия MFA получена');
 
-    totpSecret = await firebase.auth.TotpMultiFactorGenerator.generateSecret(multiFactorSession);
+    totpSecret = await window.ModAuth.TotpMultiFactorGenerator.generateSecret(multiFactorSession);
     console.log('[2FA] Секрет сгенерирован:', totpSecret.secretKey);
 
     const qrContainer = document.getElementById('qrcode');
@@ -1046,10 +1053,10 @@ document.getElementById('enrollForm').addEventListener('submit', async (e) => {
   btn.textContent = 'Сохранение…';
 
   try {
-    const user = auth.currentUser;
-    const assertion = firebase.auth.TotpMultiFactorGenerator.assertionForEnrollment(totpSecret, code);
-    // ✅ Правильный вызов в compat-версии Firebase
-    await user.multiFactor.enroll(assertion, 'Google Authenticator');
+    const authMod = window.ModAuth.getAuth(firebase.app());
+    const mfUser = window.ModAuth.multiFactor(authMod.currentUser);
+    const assertion = window.ModAuth.TotpMultiFactorGenerator.assertionForEnrollment(totpSecret, code);
+    await mfUser.enroll(assertion, 'Google Authenticator');
     showToast('2FA успешно настроена!', 'success');
     showApp();
   } catch (err) {
