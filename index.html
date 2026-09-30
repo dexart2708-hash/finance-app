@@ -19,12 +19,9 @@
 
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
-  <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -83,9 +80,9 @@
     }
     body {
       background:
-        radial-gradient(ellipse at top left, rgba(5,150,105,0.06) 0%, transparent 55%),
-        radial-gradient(ellipse at bottom right, rgba(220,38,38,0.05) 0%, transparent 55%),
-        radial-gradient(ellipse at top right, rgba(59,130,246,0.04) 0%, transparent 50%),
+        radial-gradient(ellipse at top left,    rgba(5, 150, 105, 0.06) 0%, transparent 55%),
+        radial-gradient(ellipse at bottom right, rgba(220, 38, 38, 0.05) 0%, transparent 55%),
+        radial-gradient(ellipse at top right,   rgba(59, 130, 246, 0.04) 0%, transparent 50%),
         linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
       background-attachment: fixed;
       padding: 40px 24px;
@@ -125,53 +122,6 @@
     [data-theme="dark"] .icon-sun { opacity: 0; transform: rotate(-90deg) scale(0.5); }
     [data-theme="dark"] .icon-moon { opacity: 1; transform: rotate(0deg) scale(1); }
 
-    .auth-screen {
-      display: none; align-items: center; justify-content: center;
-      min-height: 80vh; position: relative; z-index: 1;
-      animation: fadeInUp var(--transition-slow) both;
-    }
-    .auth-screen.visible { display: flex; }
-    .login-card {
-      background: var(--surface); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--card-border); border-radius: 16px;
-      padding: 40px; width: 100%; max-width: 420px;
-      box-shadow: var(--shadow-xl); position: relative; overflow: hidden;
-    }
-    .login-card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
-      background: linear-gradient(90deg, #059669 0%, #0f172a 50%, #dc2626 100%);
-    }
-    .login-logo { text-align: center; margin-bottom: 28px; }
-    .login-logo-icon {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 64px; height: 64px;
-      background: linear-gradient(135deg, var(--btn-bg-1) 0%, var(--btn-bg-2) 100%);
-      border-radius: 18px; font-size: 1.75rem; margin-bottom: 16px;
-      box-shadow: var(--shadow-md); color: #fff;
-    }
-    .login-title { font-size: 1.375rem; font-weight: 700; letter-spacing: -0.02em; color: var(--text); text-align: center; }
-    .login-subtitle { font-size: 0.875rem; color: var(--text-muted); text-align: center; margin-top: 6px; line-height: 1.5; }
-    .login-form .field { margin-bottom: 16px; }
-    .login-form button { width: 100%; }
-    .login-error {
-      background: var(--expense-soft); color: var(--expense-text);
-      border: 1px solid var(--expense-border); padding: 12px 16px;
-      border-radius: 8px; font-size: 0.8125rem; font-weight: 500;
-      margin-bottom: 16px; display: none;
-    }
-    .login-error.visible { display: block; }
-    #qrcode { display: inline-block; padding: 12px; background: #fff; border-radius: 12px; box-shadow: var(--shadow-sm); }
-    #qrcode img, #qrcode canvas { display: block; }
-    .totp-secret {
-      font-family: 'SF Mono', Monaco, Consolas, monospace; font-size: 0.875rem;
-      letter-spacing: 2px; color: var(--text); font-weight: 600;
-      background: var(--surface-alt); border: 1px solid var(--border);
-      border-radius: 8px; padding: 10px 14px; display: inline-block;
-      margin-top: 6px; user-select: all; word-break: break-all;
-    }
-
-    #app { display: none; position: relative; z-index: 1; }
-    #app.visible { display: block; }
     .page-header {
       display: flex; align-items: center; justify-content: space-between;
       flex-wrap: wrap; gap: 12px; margin-bottom: 32px; padding: 20px 24px;
@@ -189,10 +139,8 @@
     .user-avatar {
       width: 48px; height: 48px; border-radius: 50%; object-fit: cover;
       border: 3px solid var(--surface-solid); box-shadow: var(--shadow-sm);
-      background-color: var(--surface-alt);
-      cursor: pointer; flex-shrink: 0;
+      background-color: var(--surface-alt); cursor: pointer; flex-shrink: 0;
     }
-    .user-avatar:hover { transform: scale(1.08); box-shadow: var(--shadow-md); }
     .user-name-wrap { display: flex; flex-direction: column; justify-content: center; line-height: 1.25; margin-right: 4px; }
     .user-name {
       font-size: 0.9375rem; font-weight: 600; letter-spacing: -0.01em;
@@ -202,7 +150,7 @@
     }
     .user-role {
       font-size: 0.6875rem; font-weight: 500; color: var(--text-muted);
-      text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; white-space: nowrap;
+      text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px;
     }
 
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
@@ -216,7 +164,6 @@
       padding: 28px; margin-bottom: 20px; box-shadow: var(--shadow-sm);
       animation: fadeInUp var(--transition-slow) both;
     }
-    .card:hover { box-shadow: var(--shadow-md); border-color: var(--border); }
     .card-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 22px; }
     .card-title { font-size: 1rem; font-weight: 600; letter-spacing: -0.01em; color: var(--text); display: flex; align-items: center; gap: 8px; }
     .card-title::before {
@@ -224,6 +171,7 @@
       background: linear-gradient(180deg, var(--text) 0%, var(--text-muted) 100%);
       border-radius: 2px;
     }
+
     .search-wrap { position: relative; display: flex; align-items: center; max-width: 340px; width: 100%; }
     .search-icon { position: absolute; left: 14px; width: 16px; height: 16px; color: var(--text-subtle); pointer-events: none; z-index: 1; }
     .search-input { padding-left: 40px; padding-right: 44px; min-height: 44px; font-size: 0.875rem; background: var(--surface-alt); }
@@ -303,23 +251,11 @@
     button:hover::after { opacity: 1; }
     button:active { transform: translateY(0) scale(0.98); }
     button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-    button.secondary {
-      background: var(--surface-solid); color: var(--text);
-      border-color: var(--border-strong); box-shadow: var(--shadow-xs);
-    }
+    button.secondary { background: var(--surface-solid); color: var(--text); border-color: var(--border-strong); box-shadow: var(--shadow-xs); }
     button.secondary:hover { background: var(--surface-hover); border-color: var(--text-subtle); }
-    button.success {
-      background: var(--surface-solid); color: var(--income);
-      border-color: var(--income-border); box-shadow: var(--shadow-xs);
-    }
+    button.success { background: var(--surface-solid); color: var(--income); border-color: var(--income-border); box-shadow: var(--shadow-xs); }
     button.success:hover { background: var(--income-soft); border-color: var(--income); }
-    button.logout-btn {
-      background: var(--surface-solid); color: var(--expense);
-      border-color: var(--expense-border); padding: 8px 16px;
-      min-height: 40px; font-size: 0.8125rem;
-      box-shadow: var(--shadow-xs); flex-shrink: 0;
-    }
-    button.logout-btn:hover { background: var(--expense-soft); border-color: var(--expense); }
+
     .table-wrap {
       background: var(--surface-solid); border: 1px solid var(--border);
       border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-xs);
@@ -389,10 +325,7 @@
     .actions button:hover { background: var(--accent-soft); color: var(--text); border-color: var(--border); transform: scale(1.08); }
     .actions .delete-btn:hover { background: var(--expense-soft); color: var(--expense); border-color: var(--expense-border); }
     .load-more-wrap { display: flex; justify-content: center; padding: 20px; border-top: 1px solid var(--border); background: var(--surface-alt); }
-    .load-more-wrap button {
-      background: var(--surface-solid); color: var(--text);
-      border: 1px solid var(--border-strong); padding: 10px 28px; min-height: 44px;
-    }
+    .load-more-wrap button { background: var(--surface-solid); color: var(--text); border: 1px solid var(--border-strong); padding: 10px 28px; min-height: 44px; }
     .editing-badge {
       display: inline-block; font-size: 0.75rem; font-weight: 600;
       color: #92400e; background: #fffbeb; border: 1px solid #fde68a;
@@ -417,7 +350,6 @@
     .toast.hiding { animation: slideOut 0.3s ease forwards; }
     @media (max-width: 720px) {
       body { padding: 16px 12px; padding-top: calc(16px + env(safe-area-inset-top)); padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
-      body::before { background-size: 260px 260px; }
       .row { flex-direction: column; align-items: stretch; gap: 14px; }
       .field { min-width: 100%; }
       .report { grid-template-columns: 1fr; gap: 12px; }
@@ -425,7 +357,6 @@
       .report-item .value { font-size: 1.5rem; }
       .card { padding: 20px; border-radius: 12px; }
       .page-header { margin-bottom: 24px; padding: 16px; border-radius: 12px; }
-      .login-card { padding: 28px 24px; }
       .card-header { gap: 14px; }
       .search-wrap { max-width: 100%; }
       .user-info { gap: 8px; }
@@ -449,196 +380,126 @@
 
 <div id="toastContainer" class="toast-container"></div>
 
-<div id="loginScreen" class="auth-screen">
-  <div class="login-card">
-    <div class="login-logo">
-      <div class="login-logo-icon">🔐</div>
-      <div class="login-title">Вход в систему</div>
-      <div class="login-subtitle">Введите email и пароль для доступа</div>
+<div class="container">
+
+  <div class="page-header">
+    <div>
+      <div class="page-title">Учёт приходов и расходов</div>
+      <div class="page-subtitle">Финансовый реестр операций</div>
     </div>
-    <div id="loginError" class="login-error"></div>
-    <form class="login-form" id="loginForm">
-      <div class="field">
-        <label>Email</label>
-        <input type="email" id="loginEmail" placeholder="your-email@mail.ru" required autocomplete="username">
+    <div class="user-info">
+      <button class="theme-toggle" id="themeToggle" aria-label="Переключить тему">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+      <img src="avatar.jpg" alt="Пользователь" class="user-avatar" onerror="this.src='https://i.pravatar.cc/150?img=44'">
+      <div class="user-name-wrap">
+        <div class="user-name">Валерия Александрова</div>
+        <div class="user-role">Владелец</div>
       </div>
-      <div class="field">
-        <label>Пароль</label>
-        <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
-      </div>
-      <button type="submit" id="loginBtn">Войти</button>
-    </form>
+    </div>
   </div>
-</div>
 
-<div id="mfaScreen" class="auth-screen">
-  <div class="login-card">
-    <div class="login-logo">
-      <div class="login-logo-icon">📱</div>
-      <div class="login-title">Двухфакторная аутентификация</div>
-      <div class="login-subtitle">Введите 6-значный код из Google Authenticator</div>
-    </div>
-    <div id="mfaError" class="login-error"></div>
-    <form class="login-form" id="mfaForm">
-      <div class="field">
-        <label>Код из приложения</label>
-        <input type="text" id="mfaCode" placeholder="000000" maxlength="6" inputmode="numeric" pattern="[0-9]*" required autocomplete="one-time-code">
-      </div>
-      <button type="submit" id="mfaBtn">Подтвердить</button>
-      <button type="button" class="secondary" id="mfaCancelBtn" style="width:100%; margin-top:8px;">Отмена</button>
-    </form>
-  </div>
-</div>
-
-<div id="enrollScreen" class="auth-screen">
-  <div class="login-card">
-    <div class="login-logo">
-      <div class="login-logo-icon">📲</div>
-      <div class="login-title">Настройка 2FA</div>
-      <div class="login-subtitle">Отсканируйте QR-код в Google Authenticator</div>
-    </div>
-    <div id="enrollError" class="login-error"></div>
-    <div style="text-align:center; margin-bottom:20px;">
-      <div id="qrcode"></div>
-    </div>
-    <p style="font-size:0.8125rem; color:var(--text-muted); text-align:center; margin-bottom:16px; line-height:1.6;">
-      Если не можете отсканировать — введите ключ вручную:<br>
-      <span class="totp-secret" id="totpSecret"></span>
-    </p>
-    <form class="login-form" id="enrollForm">
-      <div class="field">
-        <label>Введите код из приложения</label>
-        <input type="text" id="enrollCode" placeholder="000000" maxlength="6" inputmode="numeric" pattern="[0-9]*" required autocomplete="one-time-code">
-      </div>
-      <button type="submit" id="enrollBtn">Завершить настройку</button>
-    </form>
-  </div>
-</div>
-
-<div id="app">
-  <div class="container">
-    <div class="page-header">
-      <div>
-        <div class="page-title">Учёт приходов и расходов</div>
-        <div class="page-subtitle">Финансовый реестр операций</div>
-      </div>
-      <div class="user-info">
-        <button class="theme-toggle" id="themeToggle" aria-label="Переключить тему">
-          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="4"></circle>
-            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
-          </svg>
-          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-          </svg>
-        </button>
-        <img src="avatar.jpg" alt="Пользователь" class="user-avatar" onerror="this.src='https://i.pravatar.cc/150?img=44'">
-        <div class="user-name-wrap">
-          <div class="user-name">Валерия Александрова</div>
-          <div class="user-role">Владелец</div>
-        </div>
-        <button class="logout-btn" id="logoutBtn">Выйти</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-header"><div class="card-title" id="formTitle">Новая запись</div></div>
-      <form id="addForm">
-        <div class="row">
-          <div class="field">
-            <label>Месяц</label>
-            <select id="month" required><option value="">— выберите —</option></select>
-          </div>
-          <div class="field"><label>Дата</label><input type="date" id="date" required></div>
-          <div class="field">
-            <label>Тип операции</label>
-            <select id="type" required>
-              <option value="income">Приход</option>
-              <option value="expense">Расход</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Статья</label>
-            <input type="text" id="category" list="category-list" placeholder="Зарплата, аренда…" required>
-            <datalist id="category-list"></datalist>
-          </div>
-          <div class="field"><label>Сумма, ₽</label><input type="number" id="amount" step="0.01" min="0" placeholder="0.00" required></div>
-          <div class="field" style="flex:2;"><label>Назначение</label><input type="text" id="description" placeholder="Комментарий к операции"></div>
-          <button type="submit" id="submitBtn">Добавить</button>
-          <button type="button" class="secondary" id="cancelEditBtn" style="display:none;">Отмена</button>
-        </div>
-      </form>
-    </div>
-
-    <div class="card">
-      <div class="card-header"><div class="card-title">Фильтры</div></div>
+  <div class="card">
+    <div class="card-header"><div class="card-title" id="formTitle">Новая запись</div></div>
+    <form id="addForm">
       <div class="row">
         <div class="field">
+          <label>Месяц</label>
+          <select id="month" required><option value="">— выберите —</option></select>
+        </div>
+        <div class="field"><label>Дата</label><input type="date" id="date" required></div>
+        <div class="field">
           <label>Тип операции</label>
-          <select id="filterType">
-            <option value="all">Все</option>
-            <option value="income">Только приходы</option>
-            <option value="expense">Только расходы</option>
+          <select id="type" required>
+            <option value="income">Приход</option>
+            <option value="expense">Расход</option>
           </select>
         </div>
         <div class="field">
           <label>Статья</label>
-          <select id="filterCategory"><option value="all">Все статьи</option></select>
+          <input type="text" id="category" list="category-list" placeholder="Зарплата, аренда…" required>
+          <datalist id="category-list"></datalist>
         </div>
-        <div class="field"><label>Дата от</label><input type="date" id="filterDateFrom"></div>
-        <div class="field"><label>Дата до</label><input type="date" id="filterDateTo"></div>
-        <button class="secondary" id="resetFilters">Сбросить</button>
+        <div class="field"><label>Сумма, ₽</label><input type="number" id="amount" step="0.01" min="0" placeholder="0.00" required></div>
+        <div class="field" style="flex:2;"><label>Назначение</label><input type="text" id="description" placeholder="Комментарий к операции"></div>
+        <button type="submit" id="submitBtn">Добавить</button>
+        <button type="button" class="secondary" id="cancelEditBtn" style="display:none;">Отмена</button>
       </div>
-    </div>
+    </form>
+  </div>
 
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">Отчёт за период</div>
-        <button class="success" id="exportBtn">Экспорт в Excel</button>
+  <div class="card">
+    <div class="card-header"><div class="card-title">Фильтры</div></div>
+    <div class="row">
+      <div class="field">
+        <label>Тип операции</label>
+        <select id="filterType">
+          <option value="all">Все</option>
+          <option value="income">Только приходы</option>
+          <option value="expense">Только расходы</option>
+        </select>
       </div>
-      <div class="report">
-        <div class="report-item income-item"><div class="label">Приходы</div><div class="value income" id="reportIncome">0,00</div></div>
-        <div class="report-item expense-item"><div class="label">Расходы</div><div class="value expense" id="reportExpense">0,00</div></div>
-        <div class="report-item"><div class="label">Баланс</div><div class="value" id="reportBalance">0,00</div></div>
+      <div class="field">
+        <label>Статья</label>
+        <select id="filterCategory"><option value="all">Все статьи</option></select>
       </div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">Реестр операций</div>
-        <div class="search-wrap">
-          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="7"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input type="text" id="searchInput" class="search-input" placeholder="Поиск по таблице…" autocomplete="off">
-          <button type="button" class="search-clear" id="searchClear" aria-label="Очистить">×</button>
-        </div>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Месяц</th><th>Дата</th><th>Тип</th><th>Статья</th>
-              <th class="num">Сумма, ₽</th><th>Назначение</th><th style="width:80px;"></th><th>Заметка</th>
-            </tr>
-          </thead>
-          <tbody id="recordsBody"></tbody>
-        </table>
-        <div class="empty" id="emptyMsg" style="display:none;">Записей нет</div>
-        <div class="load-more-wrap" id="loadMoreWrap" style="display:none;">
-          <button class="secondary" id="loadMoreBtn">Показать ещё 50</button>
-        </div>
-      </div>
-      <div class="search-hint">Подсказка: <span class="kbd">Ctrl</span> + <span class="kbd">K</span> — быстрый поиск</div>
+      <div class="field"><label>Дата от</label><input type="date" id="filterDateFrom"></div>
+      <div class="field"><label>Дата до</label><input type="date" id="filterDateTo"></div>
+      <button class="secondary" id="resetFilters">Сбросить</button>
     </div>
   </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Отчёт за период</div>
+      <button class="success" id="exportBtn">Экспорт в Excel</button>
+    </div>
+    <div class="report">
+      <div class="report-item income-item"><div class="label">Приходы</div><div class="value income" id="reportIncome">0,00</div></div>
+      <div class="report-item expense-item"><div class="label">Расходы</div><div class="value expense" id="reportExpense">0,00</div></div>
+      <div class="report-item"><div class="label">Баланс</div><div class="value" id="reportBalance">0,00</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Реестр операций</div>
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="searchInput" class="search-input" placeholder="Поиск по таблице…" autocomplete="off">
+        <button type="button" class="search-clear" id="searchClear" aria-label="Очистить">×</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Месяц</th><th>Дата</th><th>Тип</th><th>Статья</th>
+            <th class="num">Сумма, ₽</th><th>Назначение</th><th style="width:80px;"></th><th>Заметка</th>
+          </tr>
+        </thead>
+        <tbody id="recordsBody"></tbody>
+      </table>
+      <div class="empty" id="emptyMsg" style="display:none;">Записей нет</div>
+      <div class="load-more-wrap" id="loadMoreWrap" style="display:none;">
+        <button class="secondary" id="loadMoreBtn">Показать ещё 50</button>
+      </div>
+    </div>
+    <div class="search-hint">Подсказка: <span class="kbd">Ctrl</span> + <span class="kbd">K</span> — быстрый поиск</div>
+  </div>
+
 </div>
 
 <script type="module">
-// ============================================
-// МОДУЛЬНЫЕ ИМПОРТЫ FIREBASE v10
-// ============================================
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
 import {
   initializeFirestore,
@@ -655,19 +516,7 @@ import {
   onSnapshot,
   serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
-import {
-  getAuth,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  signOut,
-  multiFactor,
-  getMultiFactorResolver,
-  TotpMultiFactorGenerator
-} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
 
-// ============================================
-// FIREBASE CONFIG
-// ============================================
 const firebaseConfig = {
   apiKey: "AIzaSyDdm0kaIesCu4CBennxPVoPhXwyAyAiwIg",
   authDomain: "chek-listdb.firebaseapp.com",
@@ -678,34 +527,22 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 const db = initializeFirestore(app, {
   localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
 });
 
 const COLLECTION = 'finance_records';
-console.log('[INIT] Firebase инициализирован (модульный SDK)');
+console.log('[INIT] Финансы запущены (без авторизации)');
 
-// ============================================
-// СОСТОЯНИЕ
-// ============================================
 let allRecords = [];
 let unsubscribe = null;
 let editingId = null;
 let limitCount = 50;
 const LIMIT_STEP = 50;
 let lastDocCount = 0;
-let currentUser = null;
 let searchQuery = '';
 let searchTimeout = null;
-let mfaResolver = null;
-let totpSecret = null;
-let appInitialized = false;
-let mfaJustCompleted = false;
 
-// ============================================
-// TOAST
-// ============================================
 function showToast(message, type = 'info') {
   const container = document.getElementById('toastContainer');
   const toast = document.createElement('div');
@@ -721,9 +558,6 @@ function showToast(message, type = 'info') {
   }, 3500);
 }
 
-// ============================================
-// ТЕМА
-// ============================================
 document.getElementById('themeToggle').addEventListener('click', () => {
   const current = document.documentElement.getAttribute('data-theme');
   const next = current === 'dark' ? 'light' : 'dark';
@@ -731,250 +565,9 @@ document.getElementById('themeToggle').addEventListener('click', () => {
   localStorage.setItem('theme', next);
 });
 
-// ============================================
-// ЭКРАНЫ
-// ============================================
-function showScreen(screen) {
-  document.querySelectorAll('.auth-screen').forEach(el => el.classList.remove('visible'));
-  document.getElementById('app').classList.remove('visible');
-  if (screen === 'login') document.getElementById('loginScreen').classList.add('visible');
-  if (screen === 'mfa') document.getElementById('mfaScreen').classList.add('visible');
-  if (screen === 'enroll') document.getElementById('enrollScreen').classList.add('visible');
-  if (screen === 'app') document.getElementById('app').classList.add('visible');
-}
-
-function showLogin() {
-  if (unsubscribe) { unsubscribe(); unsubscribe = null; }
-  allRecords = [];
-  appInitialized = false;
-  showScreen('login');
-  document.getElementById('loginEmail').value = '';
-  document.getElementById('loginPassword').value = '';
-  document.getElementById('loginError').classList.remove('visible');
-  setTimeout(() => document.getElementById('loginEmail').focus(), 100);
-}
-
-function showApp() {
-  showScreen('app');
-  if (!appInitialized) {
-    populateMonthSelect();
-    document.getElementById('date').valueAsDate = new Date();
-    appInitialized = true;
-  }
-  subscribeToRecords();
-}
-
-// ============================================
-// ФОРМА ВХОДА
-// ============================================
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const email = document.getElementById('loginEmail').value.trim();
-  const password = document.getElementById('loginPassword').value;
-  const btn = document.getElementById('loginBtn');
-  const errBox = document.getElementById('loginError');
-
-  errBox.classList.remove('visible');
-  btn.disabled = true;
-  btn.textContent = 'Проверка…';
-
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-    // Успех → onAuthStateChanged подхватит
-  } catch (err) {
-    if (err.code === 'auth/multi-factor-auth-required') {
-      mfaResolver = getMultiFactorResolver(auth, err);
-      showScreen('mfa');
-      document.getElementById('mfaCode').value = '';
-      document.getElementById('mfaError').classList.remove('visible');
-      setTimeout(() => document.getElementById('mfaCode').focus(), 100);
-      showToast('Введите код из Google Authenticator', 'info');
-    } else {
-      let msg = 'Не удалось войти.';
-      if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') msg = 'Неверный email или пароль.';
-      else if (err.code === 'auth/user-not-found') msg = 'Пользователь не найден.';
-      else if (err.code === 'auth/invalid-email') msg = 'Некорректный email.';
-      else if (err.code === 'auth/too-many-requests') msg = 'Слишком много попыток. Попробуйте позже.';
-      else if (err.code === 'auth/network-request-failed') msg = 'Нет соединения. Проверьте интернет.';
-      else msg = err.message;
-      errBox.textContent = msg;
-      errBox.classList.add('visible');
-      document.getElementById('loginPassword').value = '';
-      document.getElementById('loginPassword').focus();
-    }
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Войти';
-  }
-});
-
-// ============================================
-// MFA — ввод кода
-// ============================================
-document.getElementById('mfaForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const code = document.getElementById('mfaCode').value.trim();
-  const btn = document.getElementById('mfaBtn');
-  const errBox = document.getElementById('mfaError');
-
-  if (!code || code.length !== 6) {
-    errBox.textContent = 'Введите 6-значный код.';
-    errBox.classList.add('visible');
-    return;
-  }
-
-  errBox.classList.remove('visible');
-  btn.disabled = true;
-  btn.textContent = 'Проверка…';
-
-  try {
-    const hint = mfaResolver.hints.find(h => h.factorId === 'totp');
-    if (!hint) throw new Error('TOTP-фактор не найден');
-
-    const assertion = TotpMultiFactorGenerator.assertionForSignIn(hint.uid, code);
-    await mfaResolver.resolveSignIn(assertion);
-    // ✅ Помечаем, что MFA только что пройден → onAuthStateChanged пойдёт сразу в приложение
-    mfaJustCompleted = true;
-    if (auth.currentUser) {
-      try { await auth.currentUser.getIdToken(true); } catch (e) { console.warn('[getIdToken]', e); }
-      try { await auth.currentUser.reload(); } catch (e) { console.warn('[reload]', e); }
-    }
-    showToast('Вход выполнен!', 'success');
-  } catch (err) {
-    console.error('MFA error:', err);
-    errBox.textContent = 'Неверный код. Попробуйте ещё раз.';
-    errBox.classList.add('visible');
-    document.getElementById('mfaCode').value = '';
-    document.getElementById('mfaCode').focus();
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Подтвердить';
-  }
-});
-
-document.getElementById('mfaCancelBtn').addEventListener('click', async () => {
-  mfaResolver = null;
-  try { await signOut(auth); } catch (e) {}
-  showLogin();
-});
-
-// ============================================
-// РЕГИСТРАЦИЯ TOTP (с защитой от повторного enrollment)
-// ============================================
-async function startEnrollment(user) {
-  try {
-    // ✅ Принудительно обновляем токен и user ПЕРЕД проверкой — enrolledFactors будут свежими
-    try { await user.getIdToken(true); } catch (e) {}
-    try { await user.reload(); } catch (e) {}
-    const fresh = auth.currentUser;
-    const existing = fresh.multiFactor?.enrolledFactors || [];
-    if (existing.length > 0) {
-      console.log('[2FA] У пользователя уже есть TOTP-фактор, пропускаем регистрацию');
-      currentUser = fresh;
-      showApp();
-      return;
-    }
-
-    console.log('[2FA] Начинаем регистрацию TOTP...');
-    console.log('[2FA] User email:', fresh?.email);
-
-    const mfUser = multiFactor(fresh);
-    const multiFactorSession = await mfUser.getSession();
-    console.log('[2FA] Сессия MFA получена');
-
-    totpSecret = await TotpMultiFactorGenerator.generateSecret(multiFactorSession);
-    console.log('[2FA] Секрет сгенерирован');
-
-    const qrContainer = document.getElementById('qrcode');
-    qrContainer.innerHTML = '';
-    const qrUrl = totpSecret.generateQrCodeUrl(fresh.email, 'Finance Valeeryyy');
-    new QRCode(qrContainer, { text: qrUrl, width: 180, height: 180 });
-
-    document.getElementById('totpSecret').textContent = totpSecret.secretKey;
-
-    showScreen('enroll');
-    document.getElementById('enrollCode').value = '';
-    document.getElementById('enrollError').classList.remove('visible');
-    setTimeout(() => document.getElementById('enrollCode').focus(), 100);
-  } catch (err) {
-    console.error('[2FA] Ошибка регистрации TOTP:', err);
-
-    // ✅ Если сервер говорит «фактор уже есть» — значит кэш врал, просто показываем приложение
-    if (err.code === 'auth/maximum-second-factor-count-exceeded' ||
-        (err.message && err.message.includes('Too many'))) {
-      console.log('[2FA] Фактор уже существует → показываем приложение');
-      showApp();
-      return;
-    }
-
-    const errBox = document.getElementById('loginError');
-    errBox.innerHTML = 'Ошибка 2FA: <strong>' + err.message + '</strong>';
-    errBox.classList.add('visible');
-    showScreen('login');
-    try { await signOut(auth); } catch (e) {}
-  }
-}
-
-document.getElementById('enrollForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const code = document.getElementById('enrollCode').value.trim();
-  const btn = document.getElementById('enrollBtn');
-  const errBox = document.getElementById('enrollError');
-
-  if (!code || code.length !== 6) {
-    errBox.textContent = 'Введите 6-значный код.';
-    errBox.classList.add('visible');
-    return;
-  }
-
-  errBox.classList.remove('visible');
-  btn.disabled = true;
-  btn.textContent = 'Сохранение…';
-
-  try {
-    const mfUser = multiFactor(auth.currentUser);
-    const assertion = TotpMultiFactorGenerator.assertionForEnrollment(totpSecret, code);
-    await mfUser.enroll(assertion, 'Google Authenticator');
-    try { await auth.currentUser.getIdToken(true); } catch (e) {}
-    try { await auth.currentUser.reload(); } catch (e) {}
-    // ✅ Помечаем, чтобы onAuthStateChanged сразу показал приложение
-    mfaJustCompleted = true;
-    showToast('2FA успешно настроена!', 'success');
-    showApp();
-  } catch (err) {
-    console.error('Ошибка завершения TOTP:', err);
-    errBox.textContent = 'Неверный код. Проверьте и попробуйте снова.';
-    errBox.classList.add('visible');
-    document.getElementById('enrollCode').value = '';
-    document.getElementById('enrollCode').focus();
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Завершить настройку';
-  }
-});
-
-// ============================================
-// ВЫХОД
-// ============================================
-document.getElementById('logoutBtn').addEventListener('click', async () => {
-  if (!confirm('Выйти из системы?')) return;
-  try {
-    await signOut(auth);
-    showToast('Вы вышли из системы', 'info');
-  } catch (err) {
-    showToast('Ошибка выхода: ' + err.message, 'error');
-  }
-});
-
-// ============================================
-// ФОРМАТ ЧИСЛА
-// ============================================
 const numberFormatter = new Intl.NumberFormat('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 function fmt(n) { return numberFormatter.format(Number(n) || 0); }
 
-// ============================================
-// МЕСЯЦЫ
-// ============================================
 function populateMonthSelect() {
   const select = document.getElementById('month');
   const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
@@ -990,17 +583,9 @@ function populateMonthSelect() {
   select.innerHTML = html;
 }
 
-// ============================================
-// FIREBASE REALTIME
-// ============================================
 function subscribeToRecords() {
-  if (!currentUser) return;
   if (unsubscribe) unsubscribe();
-  const q = query(
-    collection(db, COLLECTION),
-    orderBy('date', 'desc'),
-    limit(limitCount)
-  );
+  const q = query(collection(db, COLLECTION), orderBy('date', 'desc'), limit(limitCount));
   unsubscribe = onSnapshot(q, snapshot => {
     lastDocCount = snapshot.docs.length;
     allRecords = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1027,12 +612,8 @@ function populateCategoryFilter() {
   if (categories.includes(current)) select.value = current;
 }
 
-// ============================================
-// ПОИСК
-// ============================================
 const searchInput = document.getElementById('searchInput');
 const searchClear = document.getElementById('searchClear');
-
 searchInput.addEventListener('input', (e) => {
   const val = e.target.value;
   searchClear.classList.toggle('visible', val.length > 0);
@@ -1042,7 +623,6 @@ searchInput.addEventListener('input', (e) => {
     render();
   }, 250);
 });
-
 searchClear.addEventListener('click', () => {
   searchInput.value = '';
   searchQuery = '';
@@ -1069,15 +649,11 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// ============================================
-// ФИЛЬТРАЦИЯ
-// ============================================
 function getFiltered() {
   const type = document.getElementById('filterType').value;
   const category = document.getElementById('filterCategory').value;
   const dateFrom = document.getElementById('filterDateFrom').value;
   const dateTo = document.getElementById('filterDateTo').value;
-
   return allRecords.filter(r => {
     if (type !== 'all' && r.type !== type) return false;
     if (category !== 'all' && r.category !== category) return false;
@@ -1095,9 +671,6 @@ function getFiltered() {
   });
 }
 
-// ============================================
-// ЭКРАНИРОВАНИЕ
-// ============================================
 function esc(s) {
   return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
@@ -1120,9 +693,6 @@ function highlight(text, query) {
   return result;
 }
 
-// ============================================
-// ОТРИСОВКА
-// ============================================
 function render() {
   const filtered = getFiltered();
   const tbody = document.getElementById('recordsBody');
@@ -1173,14 +743,42 @@ function render() {
   document.getElementById('reportBalance').textContent = fmt(income - expense);
 }
 
-// ============================================
-// ГЛОБАЛЬНЫЕ ФУНКЦИИ
-// ============================================
 window.updateNote = async (id, text) => {
-  if (!currentUser) return;
   try { await updateDoc(doc(db, COLLECTION, id), { note: text.trim() }); }
   catch (err) { console.error('Ошибка заметки:', err); showToast('Не удалось сохранить заметку', 'error'); }
 };
+
+document.getElementById('loadMoreBtn').addEventListener('click', () => {
+  limitCount += LIMIT_STEP;
+  showToast(`Загружаем ещё ${LIMIT_STEP} записей…`, 'info');
+  subscribeToRecords();
+});
+
+document.getElementById('addForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const data = {
+    month: document.getElementById('month').value,
+    date: document.getElementById('date').value,
+    type: document.getElementById('type').value,
+    category: document.getElementById('category').value.trim(),
+    amount: parseFloat(document.getElementById('amount').value),
+    description: document.getElementById('description').value.trim()
+  };
+  try {
+    if (editingId) {
+      data.updatedAt = serverTimestamp();
+      await updateDoc(doc(db, COLLECTION, editingId), data);
+      showToast('Запись обновлена', 'success');
+      cancelEdit();
+    } else {
+      data.createdAt = serverTimestamp();
+      await addDoc(collection(db, COLLECTION), data);
+      showToast('Запись добавлена', 'success');
+      e.target.reset();
+      document.getElementById('date').valueAsDate = new Date();
+    }
+  } catch (err) { console.error('Ошибка:', err); showToast('Не удалось сохранить: ' + err.message, 'error'); }
+});
 
 window.startEdit = (id) => {
   const r = allRecords.find(x => x.id === id);
@@ -1204,55 +802,6 @@ window.startEdit = (id) => {
   document.getElementById('addForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 
-window.deleteRecord = async (id) => {
-  if (!currentUser) return;
-  if (!confirm('Удалить запись?')) return;
-  try {
-    await deleteDoc(doc(db, COLLECTION, id));
-    showToast('Запись удалена', 'info');
-    if (editingId === id) cancelEdit();
-  } catch (err) { console.error('Ошибка удаления:', err); showToast('Не удалось удалить: ' + err.message, 'error'); }
-};
-
-// ============================================
-// КНОПКА "ПОКАЗАТЬ ЕЩЁ"
-// ============================================
-document.getElementById('loadMoreBtn').addEventListener('click', () => {
-  limitCount += LIMIT_STEP;
-  showToast(`Загружаем ещё ${LIMIT_STEP} записей…`, 'info');
-  subscribeToRecords();
-});
-
-// ============================================
-// ДОБАВЛЕНИЕ / РЕДАКТИРОВАНИЕ
-// ============================================
-document.getElementById('addForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  if (!currentUser) return;
-  const data = {
-    month: document.getElementById('month').value,
-    date: document.getElementById('date').value,
-    type: document.getElementById('type').value,
-    category: document.getElementById('category').value.trim(),
-    amount: parseFloat(document.getElementById('amount').value),
-    description: document.getElementById('description').value.trim()
-  };
-  try {
-    if (editingId) {
-      data.updatedAt = serverTimestamp();
-      await updateDoc(doc(db, COLLECTION, editingId), data);
-      showToast('Запись обновлена', 'success');
-      cancelEdit();
-    } else {
-      data.createdAt = serverTimestamp();
-      await addDoc(collection(db, COLLECTION), data);
-      showToast('Запись добавлена', 'success');
-      e.target.reset();
-      document.getElementById('date').valueAsDate = new Date();
-    }
-  } catch (err) { console.error('Ошибка сохранения:', err); showToast('Не удалось сохранить: ' + err.message, 'error'); }
-});
-
 function cancelEdit() {
   editingId = null;
   document.getElementById('addForm').reset();
@@ -1264,16 +813,22 @@ function cancelEdit() {
 }
 document.getElementById('cancelEditBtn').addEventListener('click', cancelEdit);
 
-// ============================================
-// ЭКСПОРТ В EXCEL
-// ============================================
+window.deleteRecord = async (id) => {
+  if (!confirm('Удалить запись?')) return;
+  try {
+    await deleteDoc(doc(db, COLLECTION, id));
+    showToast('Запись удалена', 'info');
+    if (editingId === id) cancelEdit();
+  } catch (err) { console.error('Ошибка:', err); showToast('Не удалось удалить: ' + err.message, 'error'); }
+};
+
 async function loadXLSX() {
   if (window.XLSX) return window.XLSX;
   return new Promise((resolve, reject) => {
     const script = document.createElement('script');
     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
     script.onload = () => resolve(window.XLSX);
-    script.onerror = () => reject(new Error('Не удалось загрузить библиотеку Excel'));
+    script.onerror = () => reject(new Error('Не удалось загрузить Excel'));
     document.head.appendChild(script);
   });
 }
@@ -1304,14 +859,11 @@ document.getElementById('exportBtn').addEventListener('click', async () => {
     XLSX.utils.book_append_sheet(wb, ws, 'Отчёт');
     const dateStr = new Date().toISOString().slice(0, 10);
     XLSX.writeFile(wb, `finance_${dateStr}.xlsx`);
-    showToast('Экспорт успешно завершен', 'success');
-  } catch (err) { console.error('Ошибка экспорта:', err); showToast('Ошибка экспорта: ' + err.message, 'error'); }
+    showToast('Экспорт готов', 'success');
+  } catch (err) { console.error(err); showToast('Ошибка экспорта: ' + err.message, 'error'); }
   finally { btn.disabled = false; btn.textContent = 'Экспорт в Excel'; }
 });
 
-// ============================================
-// ФИЛЬТРЫ
-// ============================================
 ['filterType', 'filterCategory', 'filterDateFrom', 'filterDateTo'].forEach(id => {
   document.getElementById(id).addEventListener('change', render);
 });
@@ -1323,48 +875,10 @@ document.getElementById('resetFilters').addEventListener('click', () => {
   render();
 });
 
-// ============================================
-// ОТСЛЕЖИВАНИЕ АУТЕНТИФИКАЦИИ
-// ============================================
-onAuthStateChanged(auth, async (user) => {
-  currentUser = user;
-  if (user) {
-    // Если только что прошли MFA или enrollment — сразу показываем приложение
-    if (mfaJustCompleted) {
-      mfaJustCompleted = false;
-      console.log('[AUTH] MFA только что пройден → сразу в приложение');
-      showApp();
-      return;
-    }
-
-    // ✅ Принудительно обновляем ID-токен с сервера — reload() не обновляет enrolledFactors
-    try { await user.getIdToken(true); } catch (e) { console.warn('[getIdToken]', e); }
-    try { await user.reload(); } catch (e) { console.warn('[reload]', e); }
-    const freshUser = auth.currentUser;
-    currentUser = freshUser;
-
-    const factors = freshUser.multiFactor?.enrolledFactors || [];
-    console.log('[AUTH] Вошёл:', freshUser.email, '| TOTP-факторов:', factors.length);
-
-    if (factors.length === 0) {
-      // Если enrollment уже идёт — не запускаем повторно
-      if (window.__enrolling) {
-        console.log('[AUTH] Enrollment уже идёт, пропускаем');
-        return;
-      }
-      window.__enrolling = true;
-      try {
-        await startEnrollment(freshUser);
-      } finally {
-        window.__enrolling = false;
-      }
-    } else {
-      showApp();
-    }
-  } else {
-    showLogin();
-  }
-});
+// Старт
+populateMonthSelect();
+document.getElementById('date').valueAsDate = new Date();
+subscribeToRecords();
 </script>
 </body>
 </html>
