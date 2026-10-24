@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Учёт приходов и расходов</title>
+  <title>Учёт расходов</title>
 
   <script>
     (function() {
@@ -35,7 +35,6 @@
       --card-border: rgba(255,255,255,0.8);
       --text: #0f172a; --text-muted: #64748b; --text-subtle: #94a3b8;
       --accent-soft: #f1f5f9;
-      --income: #059669; --income-soft: #ecfdf5; --income-border: #d1fae5; --income-text: #065f46;
       --expense: #dc2626; --expense-soft: #fef2f2; --expense-border:#fee2e2; --expense-text: #991b1b;
       --btn-bg-1: #1e293b; --btn-bg-2: #0f172a; --btn-bg-1-h: #334155; --btn-bg-2-h: #1e293b;
       --shadow-xs: 0 1px 2px rgba(15,23,42,0.04);
@@ -59,7 +58,6 @@
       --card-border: rgba(255,255,255,0.08);
       --text: #f1f5f9; --text-muted: #94a3b8; --text-subtle: #64748b;
       --accent-soft: rgba(148,163,184,0.12);
-      --income: #34d399; --income-soft: rgba(5,150,105,0.15); --income-border: rgba(52,211,153,0.35); --income-text: #6ee7b7;
       --expense: #f87171; --expense-soft: rgba(220,38,38,0.15); --expense-border:rgba(248,113,113,0.35); --expense-text: #fca5a5;
       --btn-bg-1: #334155; --btn-bg-2: #1e293b; --btn-bg-1-h: #475569; --btn-bg-2-h: #334155;
       --shadow-xs: 0 1px 2px rgba(0,0,0,0.3);
@@ -80,7 +78,7 @@
     }
     body {
       background:
-        radial-gradient(ellipse at top left,    rgba(5, 150, 105, 0.06) 0%, transparent 55%),
+        radial-gradient(ellipse at top left,    rgba(220, 38, 38, 0.05) 0%, transparent 55%),
         radial-gradient(ellipse at bottom right, rgba(220, 38, 38, 0.05) 0%, transparent 55%),
         radial-gradient(ellipse at top right,   rgba(59, 130, 246, 0.04) 0%, transparent 50%),
         linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
@@ -253,8 +251,8 @@
     button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
     button.secondary { background: var(--surface-solid); color: var(--text); border-color: var(--border-strong); box-shadow: var(--shadow-xs); }
     button.secondary:hover { background: var(--surface-hover); border-color: var(--text-subtle); }
-    button.success { background: var(--surface-solid); color: var(--income); border-color: var(--income-border); box-shadow: var(--shadow-xs); }
-    button.success:hover { background: var(--income-soft); border-color: var(--income); }
+    button.success { background: var(--surface-solid); color: var(--expense); border-color: var(--expense-border); box-shadow: var(--shadow-xs); }
+    button.success:hover { background: var(--expense-soft); border-color: var(--expense); }
 
     .table-wrap {
       background: var(--surface-solid); border: 1px solid var(--border);
@@ -270,11 +268,7 @@
     tbody tr:last-child td { border-bottom: none; }
     tbody tr:hover { background: var(--surface-hover); }
     td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
-    .income  { color: var(--income);  font-weight: 600; }
     .expense { color: var(--expense); font-weight: 600; }
-    .badge { display: inline-block; font-size: 0.6875rem; font-weight: 600; padding: 5px 12px; border-radius: 6px; white-space: nowrap; }
-    .badge-income  { background: var(--income-soft); color: var(--income-text); border: 1px solid var(--income-border); }
-    .badge-expense { background: var(--expense-soft); color: var(--expense-text); border: 1px solid var(--expense-border); }
     .note-input {
       width: 100%; min-height: 38px; padding: 8px 12px;
       font-family: var(--font); font-size: 0.8125rem;
@@ -285,7 +279,8 @@
     .note-input:hover { background: var(--surface-hover); border-color: var(--border); }
     .note-input:focus { background: var(--surface-solid); border-color: var(--text); box-shadow: 0 0 0 3px rgba(148,163,184,0.15); }
     .note-input::placeholder { color: var(--text-subtle); font-style: italic; }
-    .report { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    
+    .report { display: grid; grid-template-columns: 1fr; gap: 16px; max-width: 500px; }
     .report-item {
       background: linear-gradient(180deg, var(--surface-alt) 0%, var(--surface-solid) 100%);
       border: 1px solid var(--border); border-radius: 12px;
@@ -294,17 +289,14 @@
     }
     .report-item::before {
       content: ''; position: absolute; top: 0; left: 0; right: 0;
-      height: 3px; background: linear-gradient(90deg, #cbd5e1 0%, #94a3b8 100%);
+      height: 3px; background: linear-gradient(90deg, #f87171 0%, #dc2626 100%);
       opacity: 0; transition: opacity var(--transition);
     }
     .report-item:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--border-strong); }
     .report-item:hover::before { opacity: 1; }
-    .report-item.income-item::before { background: linear-gradient(90deg, #34d399 0%, #059669 100%); }
-    .report-item.expense-item::before { background: linear-gradient(90deg, #f87171 0%, #dc2626 100%); }
     .report-item .label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
-    .report-item .value { font-size: 1.875rem; font-weight: 800; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; line-height: 1.1; color: var(--text); }
-    .report-item .value.income  { color: var(--income); }
-    .report-item .value.expense { color: var(--expense); }
+    .report-item .value { font-size: 1.875rem; font-weight: 800; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; line-height: 1.1; color: var(--expense); }
+    
     .empty { text-align: center; padding: 56px 20px; color: var(--text-muted); font-size: 0.875rem; }
     .empty::before { content: '📭'; display: block; font-size: 2.5rem; margin-bottom: 12px; opacity: 0.5; }
     .empty.searching::before { content: '🔍'; }
@@ -342,17 +334,18 @@
       font-size: 0.875rem; font-weight: 500; color: var(--text);
       border-left: 4px solid var(--text);
     }
-    .toast.success { border-left-color: var(--income); }
-    .toast.error { border-left-color: var(--expense); }
+    .toast.success { border-left-color: var(--expense); }
+    .toast.error { border-left-color: #dc2626; }
     .toast.info { border-left-color: #3b82f6; }
     .toast-icon { font-size: 1.125rem; line-height: 1.4; }
     .toast-message { flex: 1; word-break: break-word; line-height: 1.4; }
     .toast.hiding { animation: slideOut 0.3s ease forwards; }
+
     @media (max-width: 720px) {
       body { padding: 16px 12px; padding-top: calc(16px + env(safe-area-inset-top)); padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
       .row { flex-direction: column; align-items: stretch; gap: 14px; }
       .field { min-width: 100%; }
-      .report { grid-template-columns: 1fr; gap: 12px; }
+      .report { max-width: 100%; }
       .page-title { font-size: 1.25rem; }
       .report-item .value { font-size: 1.5rem; }
       .card { padding: 20px; border-radius: 12px; }
@@ -366,14 +359,15 @@
       .theme-toggle { width: 40px; height: 40px; }
       .theme-toggle svg { width: 18px; height: 18px; }
       th:nth-child(1), td:nth-child(1) { display: none; }
-      th:nth-child(6), td:nth-child(6) { display: none; }
-      th:nth-child(8), td:nth-child(8) { display: none; }
+      th:nth-child(5), td:nth-child(5) { display: none; }
+      th:nth-child(7), td:nth-child(7) { display: none; }
       thead th, tbody td { padding: 12px 10px; font-size: 0.8125rem; }
-      .badge { font-size: 0.625rem; padding: 4px 8px; }
       .toast-container { top: 12px; right: 12px; left: 12px; }
       .toast { min-width: auto; width: 100%; }
     }
-    @media (max-width: 380px) { th:nth-child(4), td:nth-child(4) { display: none; } }
+    @media (max-width: 380px) {
+      th:nth-child(3), td:nth-child(3) { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -384,7 +378,7 @@
 
   <div class="page-header">
     <div>
-      <div class="page-title">Учёт приходов и расходов</div>
+      <div class="page-title">Учёт расходов</div>
       <div class="page-subtitle">Финансовый реестр операций</div>
     </div>
     <div class="user-info">
@@ -406,7 +400,7 @@
   </div>
 
   <div class="card">
-    <div class="card-header"><div class="card-title" id="formTitle">Новая запись</div></div>
+    <div class="card-header"><div class="card-title" id="formTitle">Новый расход</div></div>
     <form id="addForm">
       <div class="row">
         <div class="field">
@@ -414,20 +408,19 @@
           <select id="month" required><option value="">— выберите —</option></select>
         </div>
         <div class="field"><label>Дата</label><input type="date" id="date" required></div>
-        <div class="field">
-          <label>Тип операции</label>
-          <select id="type" required>
-            <option value="income">Приход</option>
-            <option value="expense">Расход</option>
-          </select>
-        </div>
-        <div class="field">
+        <div class="field" style="flex:1.5;">
           <label>Статья</label>
-          <input type="text" id="category" list="category-list" placeholder="Зарплата, аренда…" required>
+          <input type="text" id="category" list="category-list" placeholder="Продукты, аренда…" required>
           <datalist id="category-list"></datalist>
         </div>
-        <div class="field"><label>Сумма, ₽</label><input type="number" id="amount" step="0.01" min="0" placeholder="0.00" required></div>
-        <div class="field" style="flex:2;"><label>Назначение</label><input type="text" id="description" placeholder="Комментарий к операции"></div>
+        <div class="field">
+          <label>Сумма, ₽</label>
+          <input type="number" id="amount" step="0.01" min="0" placeholder="0.00" required>
+        </div>
+        <div class="field" style="flex:2;">
+          <label>Назначение</label>
+          <input type="text" id="description" placeholder="Комментарий к расходу">
+        </div>
         <button type="submit" id="submitBtn">Добавить</button>
         <button type="button" class="secondary" id="cancelEditBtn" style="display:none;">Отмена</button>
       </div>
@@ -437,14 +430,6 @@
   <div class="card">
     <div class="card-header"><div class="card-title">Фильтры</div></div>
     <div class="row">
-      <div class="field">
-        <label>Тип операции</label>
-        <select id="filterType">
-          <option value="all">Все</option>
-          <option value="income">Только приходы</option>
-          <option value="expense">Только расходы</option>
-        </select>
-      </div>
       <div class="field">
         <label>Статья</label>
         <select id="filterCategory"><option value="all">Все статьи</option></select>
@@ -461,15 +446,16 @@
       <button class="success" id="exportBtn">Экспорт в Excel</button>
     </div>
     <div class="report">
-      <div class="report-item income-item"><div class="label">Приходы</div><div class="value income" id="reportIncome">0,00</div></div>
-      <div class="report-item expense-item"><div class="label">Расходы</div><div class="value expense" id="reportExpense">0,00</div></div>
-      <div class="report-item"><div class="label">Баланс</div><div class="value" id="reportBalance">0,00</div></div>
+      <div class="report-item">
+        <div class="label">Расходы</div>
+        <div class="value" id="reportExpense">0,00</div>
+      </div>
     </div>
   </div>
 
   <div class="card">
     <div class="card-header">
-      <div class="card-title">Реестр операций</div>
+      <div class="card-title">Реестр расходов</div>
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="7"></circle>
@@ -483,8 +469,13 @@
       <table>
         <thead>
           <tr>
-            <th>Месяц</th><th>Дата</th><th>Тип</th><th>Статья</th>
-            <th class="num">Сумма, ₽</th><th>Назначение</th><th style="width:80px;"></th><th>Заметка</th>
+            <th>Месяц</th>
+            <th>Дата</th>
+            <th>Статья</th>
+            <th class="num">Сумма, ₽</th>
+            <th>Назначение</th>
+            <th style="width:80px;"></th>
+            <th>Заметка</th>
           </tr>
         </thead>
         <tbody id="recordsBody"></tbody>
@@ -532,7 +523,7 @@ const db = initializeFirestore(app, {
 });
 
 const COLLECTION = 'finance_records';
-console.log('[INIT] Финансы запущены (без авторизации)');
+console.log('[INIT] Учёт расходов запущен');
 
 let allRecords = [];
 let unsubscribe = null;
@@ -588,7 +579,8 @@ function subscribeToRecords() {
   const q = query(collection(db, COLLECTION), orderBy('date', 'desc'), limit(limitCount));
   unsubscribe = onSnapshot(q, snapshot => {
     lastDocCount = snapshot.docs.length;
-    allRecords = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    // ✅ Фильтруем только расходы (игнорируем старые записи приходов)
+    allRecords = snapshot.docs.map(d => ({ id: d.id, ...d.data() })).filter(r => r.type === 'expense' || !r.type);
     populateCategoryFilter();
     populateCategoryDatalist();
     render();
@@ -650,19 +642,16 @@ document.addEventListener('keydown', (e) => {
 });
 
 function getFiltered() {
-  const type = document.getElementById('filterType').value;
   const category = document.getElementById('filterCategory').value;
   const dateFrom = document.getElementById('filterDateFrom').value;
   const dateTo = document.getElementById('filterDateTo').value;
   return allRecords.filter(r => {
-    if (type !== 'all' && r.type !== type) return false;
     if (category !== 'all' && r.category !== category) return false;
     if (dateFrom && r.date < dateFrom) return false;
     if (dateTo && r.date > dateTo) return false;
     if (searchQuery) {
       const haystack = [
         r.month, r.date, r.category, r.description, r.note,
-        r.type === 'income' ? 'приход' : 'расход',
         String(r.amount || '')
       ].map(v => String(v == null ? '' : v).toLowerCase()).join(' ');
       if (!haystack.includes(searchQuery)) return false;
@@ -713,15 +702,12 @@ function render() {
   } else {
     emptyMsg.style.display = 'none';
     tbody.innerHTML = filtered.map(r => {
-      const isIncome = r.type === 'income';
-      const badge = isIncome ? '<span class="badge badge-income">Приход</span>' : '<span class="badge badge-expense">Расход</span>';
       return `
         <tr>
           <td>${highlight(r.month || '—', searchQuery)}</td>
           <td>${highlight(r.date || '—', searchQuery)}</td>
-          <td>${badge}</td>
           <td>${highlight(r.category || '—', searchQuery)}</td>
-          <td class="num ${isIncome ? 'income' : 'expense'}">${highlight(fmt(r.amount), searchQuery)}</td>
+          <td class="num expense">${highlight(fmt(r.amount), searchQuery)}</td>
           <td>${highlight(r.description || '—', searchQuery)}</td>
           <td class="actions">
             <button class="edit-btn" onclick="startEdit('${r.id}')" title="Редактировать">✏️</button>
@@ -736,16 +722,13 @@ function render() {
     loadMoreWrap.style.display = (lastDocCount >= limitCount) ? 'flex' : 'none';
   }
 
-  const income = filtered.filter(r => r.type === 'income').reduce((s, r) => s + Number(r.amount), 0);
-  const expense = filtered.filter(r => r.type === 'expense').reduce((s, r) => s + Number(r.amount), 0);
-  document.getElementById('reportIncome').textContent = fmt(income);
+  const expense = filtered.reduce((s, r) => s + Number(r.amount), 0);
   document.getElementById('reportExpense').textContent = fmt(expense);
-  document.getElementById('reportBalance').textContent = fmt(income - expense);
 }
 
 window.updateNote = async (id, text) => {
   try { await updateDoc(doc(db, COLLECTION, id), { note: text.trim() }); }
-  catch (err) { console.error('Ошибка заметки:', err); showToast('Не удалось сохранить заметку', 'error'); }
+  catch (err) { console.error('Ошибка:', err); showToast('Не удалось сохранить заметку', 'error'); }
 };
 
 document.getElementById('loadMoreBtn').addEventListener('click', () => {
@@ -759,7 +742,7 @@ document.getElementById('addForm').addEventListener('submit', async (e) => {
   const data = {
     month: document.getElementById('month').value,
     date: document.getElementById('date').value,
-    type: document.getElementById('type').value,
+    type: 'expense', // ✅ Жестко задаем тип "расход"
     category: document.getElementById('category').value.trim(),
     amount: parseFloat(document.getElementById('amount').value),
     description: document.getElementById('description').value.trim()
@@ -773,7 +756,7 @@ document.getElementById('addForm').addEventListener('submit', async (e) => {
     } else {
       data.createdAt = serverTimestamp();
       await addDoc(collection(db, COLLECTION), data);
-      showToast('Запись добавлена', 'success');
+      showToast('Расход добавлен', 'success');
       e.target.reset();
       document.getElementById('date').valueAsDate = new Date();
     }
@@ -791,7 +774,6 @@ window.startEdit = (id) => {
   }
   monthSelect.value = r.month || '';
   document.getElementById('date').value = r.date || '';
-  document.getElementById('type').value = r.type || 'income';
   document.getElementById('category').value = r.category || '';
   document.getElementById('amount').value = r.amount != null ? r.amount : '';
   document.getElementById('description').value = r.description || '';
@@ -807,7 +789,7 @@ function cancelEdit() {
   document.getElementById('addForm').reset();
   document.getElementById('month').value = '';
   document.getElementById('date').valueAsDate = new Date();
-  document.getElementById('formTitle').textContent = 'Новая запись';
+  document.getElementById('formTitle').textContent = 'Новый расход';
   document.getElementById('submitBtn').textContent = 'Добавить';
   document.getElementById('cancelEditBtn').style.display = 'none';
 }
@@ -841,34 +823,32 @@ document.getElementById('exportBtn').addEventListener('click', async () => {
     await loadXLSX();
     const filtered = getFiltered();
     if (filtered.length === 0) { showToast('Нет данных для выгрузки', 'info'); return; }
-    const aoa = [['Месяц', 'Дата', 'Тип', 'Статья', 'Сумма', 'Назначение', 'Заметка']];
+    const aoa = [['Месяц', 'Дата', 'Статья', 'Сумма', 'Назначение', 'Заметка']];
     filtered.forEach(r => {
-      aoa.push([r.month || '', r.date || '', r.type === 'income' ? 'Приход' : 'Расход', r.category || '', Number(r.amount) || 0, r.description || '', r.note || '']);
+      aoa.push([r.month || '', r.date || '', r.category || '', Number(r.amount) || 0, r.description || '', r.note || '']);
     });
-    const income = filtered.filter(r => r.type === 'income').reduce((s, r) => s + Number(r.amount), 0);
-    const expense = filtered.filter(r => r.type === 'expense').reduce((s, r) => s + Number(r.amount), 0);
-    aoa.push([], ['', '', '', 'Приходы:', income], ['', '', '', 'Расходы:', expense], ['', '', '', 'Баланс:', income - expense]);
+    const expense = filtered.reduce((s, r) => s + Number(r.amount), 0);
+    aoa.push([], ['', '', 'Итого расходов:', expense]);
     const ws = XLSX.utils.aoa_to_sheet(aoa);
     const range = XLSX.utils.decode_range(ws['!ref']);
     for (let r = 1; r <= range.e.r; r++) {
-      const cell = ws[XLSX.utils.encode_cell({ r, c: 4 })];
+      const cell = ws[XLSX.utils.encode_cell({ r, c: 3 })];
       if (cell && typeof cell.v === 'number') cell.z = '#,##0.00';
     }
-    ws['!cols'] = [{ wch: 16 }, { wch: 12 }, { wch: 10 }, { wch: 22 }, { wch: 16 }, { wch: 32 }, { wch: 32 }];
+    ws['!cols'] = [{ wch: 16 }, { wch: 12 }, { wch: 22 }, { wch: 16 }, { wch: 32 }, { wch: 32 }];
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Отчёт');
+    XLSX.utils.book_append_sheet(wb, ws, 'Расходы');
     const dateStr = new Date().toISOString().slice(0, 10);
-    XLSX.writeFile(wb, `finance_${dateStr}.xlsx`);
+    XLSX.writeFile(wb, `expenses_${dateStr}.xlsx`);
     showToast('Экспорт готов', 'success');
   } catch (err) { console.error(err); showToast('Ошибка экспорта: ' + err.message, 'error'); }
   finally { btn.disabled = false; btn.textContent = 'Экспорт в Excel'; }
 });
 
-['filterType', 'filterCategory', 'filterDateFrom', 'filterDateTo'].forEach(id => {
+['filterCategory', 'filterDateFrom', 'filterDateTo'].forEach(id => {
   document.getElementById(id).addEventListener('change', render);
 });
 document.getElementById('resetFilters').addEventListener('click', () => {
-  document.getElementById('filterType').value = 'all';
   document.getElementById('filterCategory').value = 'all';
   document.getElementById('filterDateFrom').value = '';
   document.getElementById('filterDateTo').value = '';
