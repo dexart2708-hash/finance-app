@@ -860,5 +860,99 @@ populateMonthSelect();
 document.getElementById('date').valueAsDate = new Date();
 subscribeToRecords();
 </script>
+  <!-- ❄️ НОВОГОДНИЙ СНЕГОПАД ❄️ -->
+<style>
+  #snow-container {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    pointer-events: none; /* Чтобы снежинки не мешали кликам */
+    z-index: 99999;
+    overflow: hidden;
+  }
+  .snowflake {
+    position: absolute;
+    top: -50px;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    user-select: none;
+    pointer-events: none;
+    /* Плавное падение и покачивание */
+    animation: fall linear infinite, sway ease-in-out infinite alternate;
+  }
+  /* Немного размытия для объема (кроме Safari, если тормозит) */
+  @supports (filter: blur(1px)) {
+    .snowflake { filter: drop-shadow(0 0 2px rgba(255,255,255,0.8)); }
+  }
+  @keyframes fall {
+    to { transform: translateY(105vh); }
+  }
+  @keyframes sway {
+    from { margin-left: -15px; }
+    to { margin-left: 15px; }
+  }
+  
+  /* Уважаем настройки пользователя, если он отключил анимации */
+  @media (prefers-reduced-motion: reduce) {
+    #snow-container { display: none; }
+  }
+</style>
+
+<div id="snow-container"></div>
+
+<script>
+  (function() {
+    // Если хотите выключить снег, просто закомментируйте эту строку или удалите весь блок
+    const SNOWFLAKES_COUNT = 40; 
+    
+    const container = document.getElementById('snow-container');
+    const snowflakeChars = ['❅', '❆', '❄', '•']; // Разные символы
+
+    // Не запускаем снег, если включен экспорт в PDF (чтобы не было на картинке)
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          if (document.body.classList.contains('exporting')) {
+            container.style.display = 'none';
+          } else {
+            container.style.display = 'block';
+          }
+        }
+      });
+    });
+    observer.observe(document.body, { attributes: true });
+
+    function createSnowflakes() {
+      for (let i = 0; i < SNOWFLAKES_COUNT; i++) {
+        const flake = document.createElement('div');
+        flake.className = 'snowflake';
+        
+        // Случайный символ
+        flake.innerText = snowflakeChars[Math.floor(Math.random() * snowflakeChars.length)];
+        
+        // Случайная позиция по горизонтали (0 - 100vw)
+        flake.style.left = Math.random() * 100 + 'vw';
+        
+        // Случайный размер (10px - 25px)
+        flake.style.fontSize = (Math.random() * 15 + 10) + 'px';
+        
+        // Случайная прозрачность (0.3 - 1)
+        flake.style.opacity = (Math.random() * 0.7 + 0.3);
+        
+        // Случайная скорость падения (5s - 15s)
+        const fallDuration = Math.random() * 10 + 5;
+        flake.style.animationDuration = `${fallDuration}s, ${Math.random() * 2 + 1}s`;
+        
+        // Случайная задержка перед началом падения (0s - 15s), чтобы снежинки начали падать не все сразу
+        flake.style.animationDelay = `-${Math.random() * 15}s, 0s`;
+        
+        container.appendChild(flake);
+      }
+    }
+
+    createSnowflakes();
+  })();
+</script>
+<!-- ❄️ КОНЕЦ СНЕГОПАДА ❄️ -->
 </body>
 </html>
